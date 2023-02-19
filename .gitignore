@@ -1,0 +1,10 @@
+__pycache__/
+db.sqlite3*
+.python-version
+.coverage
+.coveralls.yml
+/django_modeltree.egg-info/
+/build/
+/dist/
+/.tox/
+/.vscode/
