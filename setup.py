@@ -11,7 +11,15 @@ def read(filename):
         return file.read()
 
 
-version = __import__("taggit_ui").__version__
+def version():
+    """Get the local package version."""
+    namespace = {}
+    path = Path("modeltree", "__version__.py")
+    exec(path.read_text(), namespace)
+    return namespace["__version__"]
+
+
+version = version()
 if 'dev' in version:
     dev_status = 'Development Status :: 3 - Alpha'
 elif 'beta' in version:
