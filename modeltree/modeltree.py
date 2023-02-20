@@ -35,13 +35,17 @@ class ModelTree(AnyNode):
     @property
     def label(self):
         if self.field:
-            return '{} -> {}'.format(self.field.name, self.model._meta.verbose_name)
+            return '{} -> {}'.format(self.field.name, self.model._meta.object_name)
         else:
-            return str(self.model._meta.verbose_name)
+            return str(self.model._meta.object_name)
  
     @property
     def label_path(self):
         return '.'.join(n.label for n in self.path)
+
+    @property
+    def model_path(self):
+        return ' -> '.join(n.model._meta.object_name for n in self.path)
 
     @property
     def field_path(self):

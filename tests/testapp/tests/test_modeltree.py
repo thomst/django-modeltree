@@ -35,8 +35,8 @@ class ModelTreeTestCase(TestCase):
         root = ModelTree(ModelA)
         # print(RenderTree(root).by_attr('field_path'))
         node = find(root, lambda n: n.field_path == 'model_c__modelb__model_b')
-        self.assertEqual(node.label, 'model_b -> model b')
-        self.assertEqual(node.label_path, 'model a.model_c -> model c.modelb -> model b.model_b -> model b')
+        self.assertEqual(node.label, 'model_b -> ModelB')
+        self.assertEqual(node.label_path, 'ModelA.model_c -> ModelC.modelb -> ModelB.model_b -> ModelB')
         self.assertEqual(len(node.path), 4)
         self.assertEqual(node.items, None)
 
