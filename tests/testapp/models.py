@@ -36,6 +36,6 @@ class ModelD(BaseModel):
 
 class ModelE(BaseModel):
     id = models.SmallIntegerField(primary_key=True)
-    model_d1 = models.OneToOneField('ModelD', blank=True, null=True, related_name='modele1', on_delete=models.SET_NULL)
-    model_d2 = models.ForeignKey('ModelD', blank=True, null=True, related_name='modele2', on_delete=models.SET_NULL)
-    model_d3 = models.ManyToManyField('ModelD', blank=True, related_name='modele3')
+    model_d = models.OneToOneField('ModelD', blank=True, null=True, on_delete=models.SET_NULL)
+    model_c = models.ForeignKey('ModelC', blank=True, null=True, on_delete=models.SET_NULL)
+    model_b = models.ManyToManyField('ModelB', blank=True)
