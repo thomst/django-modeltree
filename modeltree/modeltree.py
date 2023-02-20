@@ -53,19 +53,10 @@ class ModelTree(AnyNode):
 
     @property
     def items(self):
-        if self.is_root and self._items:
-            self._items = list(self._items.all())
-        elif not self.is_root and self.parent.items and self._items is None:
-            self._items = list()
-            for item in self.parent.items:
-                # Check if item has field attribute which is not empty.
-                if hasattr(item, self.field.name) and getattr(item, self.field.name):
-                    # Get items from ManyTo-fields.
-                    try:
-                        self._items += list(getattr(item, self.field.name).all())
-                    # Get item from OneTo-fields.
-                    except AttributeError:
-                        self._items.append(getattr(item, self.field.name))
+        if self._items is None and not self.root._items is None:
+            query = self.field.remote_field.name + '__pk__in'
+            item_ids = [i.pk for i in self.parent.items.all()]
+            self._items = self.model.objects.filter(**{query: item_ids})
         return self._items
 
     def follow_this_field(self, field):
