@@ -1,7 +1,6 @@
 
 from anytree import AnyNode
 from django.db import models
-from django.db.models.query import QuerySet
 
 
 ORIGINAL_RELATION_TYPES = (
