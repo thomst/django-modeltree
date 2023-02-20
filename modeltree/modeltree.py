@@ -29,6 +29,7 @@ class ModelTree(AnyNode):
         self.model = model
         self.field = field
         self._items = items
+        self._options = self._get_options()
         self._build_tree()
 
     @property
@@ -63,34 +64,45 @@ class ModelTree(AnyNode):
                         self._items.append(getattr(item, self.field.name))
         return self._items
 
+    def follow_this_field(self, field):
+        """
+        Overwrite this method to filter the field to follow when building the tree.
+        """
+        return True
+
+    def _get_options(self):
+        options = set()
+        for option in self.OPTIONS:
+            splitted = option.split('__')
+            for i in range(len(splitted)):
+                options.add('__'.join(splitted[:i+1]))
+        return list(options)
+
     def _get_relation_fields(self):
-        """
-        Get model fields that are supported relation fields.
-        """
         fields = self.model._meta.get_fields()
         check_type = lambda f: any(issubclass(type(f), r) for r in self.RELATION_TYPES)
         fields = [f for f in fields if check_type(f)]
         return fields
 
+    def _field_is_valid(self, field):
+        if field.remote_field is self.field:
+            return False
+
+        is_remote = lambda f: any(isinstance(f, t) for t in REMOTE_RELATION_TYPES)
+        if field.related_model is self.model and is_remote(field):
+            return False
+
+        field_path = (self.field_path + '__' + field.name).strip('_')
+        if self._options and not field_path in self._options:
+            return False
+
+        if not self.follow_this_field(field):
+            return False
+
+        return True
+
     def _build_tree(self):
         if self.depth < self.MAX_DEPTH:
             for field in self._get_relation_fields():
-                field_path = (self.field_path + '__' + field.name).strip('_')
-
-                # Continue if field is the remote reference two its parent.
-                if getattr(field, 'remote_field', None) is self.field \
-                    or field is getattr(self.field, 'remote_field', None):
-                    continue
-
-                # Continue for model relations to itsel if field is a remote field.
-                elif field.related_model is self.model \
-                    and any(isinstance(field, t) for t in REMOTE_RELATION_TYPES):
-                    continue
-
-                # Continue if OPTIONS are set and field-path is not listed.
-                elif self.OPTIONS and not field_path in self.OPTIONS:
-                    continue
-
-                # Create ModelNode.
-                else:
+                if self._field_is_valid(field):
                     self.__class__(model=field.related_model, field=field, parent=self)

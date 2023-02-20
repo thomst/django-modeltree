@@ -12,9 +12,8 @@ from testapp.management.commands.createtestdata import create_test_data
 
 class ModelTreeWithOptions(ModelTree):
     OPTIONS = [
-        'model_c',
-        'model_c__modelb',
         'model_c__modelb__model_b',
+        'model_d__modelc__modela',
     ]
 
 
@@ -40,10 +39,9 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(node.path), 4)
         self.assertEqual(node.items, None)
 
-        # print(RenderTree(root).by_attr('model'))
-
     def test_02_tree(self):
         root = ModelTree(ModelA)
+        # print(RenderTree(root).by_attr('field_path'))
         self.assertEqual(len([n for n in LevelOrderIter(root)]), 31)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 6)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 6)
@@ -53,12 +51,14 @@ class ModelTreeTestCase(TestCase):
 
     def test_03_tree_with_options(self):
         root = ModelTreeWithOptions(ModelA)
-        self.assertEqual(len([n for n in LevelOrderIter(root)]), 4)
-        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 1)
+        # print(RenderTree(root).by_attr('field_path'))
+        self.assertEqual(len([n for n in LevelOrderIter(root)]), 7)
+        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 2)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 2)
-        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 1)
-        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelD)), 0)
+        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 2)
+        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelD)), 1)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelE)), 0)
+
 
     def test_04_tree_with_max_depth(self):
         root = ModelTreeWithMaxDepth(ModelA)
