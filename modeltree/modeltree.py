@@ -27,6 +27,7 @@ class ModelTree(AnyNode):
     def __init__(self, model, items=None, field=None, **kwargs):
         super().__init__(**kwargs)
         self.model = model
+        self.model_name = model._meta.object_name
         self.field = field
         self._items = items
         self._options = self._get_options()
@@ -35,9 +36,9 @@ class ModelTree(AnyNode):
     @property
     def label(self):
         if self.field:
-            return '{} -> {}'.format(self.field.name, self.model._meta.object_name)
+            return '{} -> {}'.format(self.field.name, self.model_name)
         else:
-            return str(self.model._meta.object_name)
+            return str(self.model_name)
  
     @property
     def label_path(self):
@@ -45,7 +46,7 @@ class ModelTree(AnyNode):
 
     @property
     def model_path(self):
-        return ' -> '.join(n.model._meta.object_name for n in self.path)
+        return ' -> '.join(n.model_name for n in self.path)
 
     @property
     def field_path(self):
