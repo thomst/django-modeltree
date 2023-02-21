@@ -1,5 +1,7 @@
 
 from anytree import AnyNode
+from anytree import RenderTree
+from anytree import find
 from django.db import models
 
 
@@ -83,6 +85,15 @@ class ModelTree(AnyNode):
             item_ids = [i.pk for i in self.parent.items.all()]
             self._items = self.model.objects.filter(**{query: item_ids}).distinct()
         return self._items
+
+    def render(self, key='verbose_label'):
+        return (RenderTree(self).by_attr(key))
+
+    def show(self, key='verbose_label'):
+        print(self.render(key))
+
+    def find(self, value, key='field_path'):
+        return find(self, lambda n: getattr(n, key) == value)
 
     def follow_this_field(self, field):
         """
