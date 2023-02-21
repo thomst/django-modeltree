@@ -95,11 +95,6 @@ class ModelTree(AnyNode):
     def find(self, value, key='field_path'):
         return find(self, lambda n: getattr(n, key) == value)
 
-    def follow_this_field(self, field):
-        """
-        Overwrite this method to filter the field to follow when building the tree.
-        """
-        return True
 
     def _get_options(self):
         options = set()
@@ -125,9 +120,6 @@ class ModelTree(AnyNode):
 
         field_path = (self.field_path + '__' + field.name).strip('_')
         if self._options and not field_path in self._options:
-            return False
-
-        if not self.follow_this_field(field):
             return False
 
         return True
