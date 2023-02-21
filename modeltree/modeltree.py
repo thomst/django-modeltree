@@ -1,7 +1,10 @@
 
 from anytree import AnyNode
 from anytree import RenderTree
+from anytree import LevelOrderIter
+from anytree import LevelOrderGroupIter
 from anytree import find
+from anytree import findall
 from django.db import models
 
 
@@ -95,6 +98,18 @@ class ModelTree(AnyNode):
     def find(self, value, key='field_path'):
         return find(self, lambda n: getattr(n, key) == value)
 
+    def findall(self, value, key='field_path'):
+        return findall(self, lambda n: value in getattr(n, key))
+
+    def iter(self, maxlevel=None, group=False, has_items=False):
+        if has_items:
+            filter = lambda n: bool(n.items)
+        else:
+            filter = None
+        if group:
+            return LevelOrderGroupIter(self, maxlevel=maxlevel, filter_=filter)
+        else:
+            return LevelOrderIter(self, maxlevel=maxlevel, filter_=filter)
 
     def _get_options(self):
         options = set()
