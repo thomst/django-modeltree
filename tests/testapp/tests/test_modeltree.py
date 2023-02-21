@@ -1,5 +1,3 @@
-
-
 from io import StringIO
 from contextlib import redirect_stdout
 from django.test import TestCase
@@ -37,17 +35,15 @@ class ModelTreeTestCase(TestCase):
 
     def test_02_tree(self):
         root = ModelTree(ModelA)
-        # print(RenderTree(root).by_attr('field_path'))
-        self.assertEqual(len(list(root.iter())), 33)
-        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 6)
-        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 8)
-        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 6)
+        self.assertEqual(len(list(root.iter())), 39)
+        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 7)
+        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 11)
+        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 7)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelD)), 5)
-        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelE)), 8)
+        self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelE)), 9)
 
     def test_03_tree_with_options(self):
         root = ModelTreeWithOptions(ModelA)
-        # print(RenderTree(root).by_attr('field_path'))
         self.assertEqual(len(list(root.iter())), 7)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 2)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 2)
@@ -108,7 +104,7 @@ class ModelTreeTestCase(TestCase):
         # iter
         root = ModelTree(ModelA)
         nodes = list(root.iter())
-        self.assertEqual(len(nodes), 33)
+        self.assertEqual(len(nodes), 39)
 
         # iter with group
         nodes = list(root.iter(group=True))
@@ -129,7 +125,7 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(root.find(field_path).field_path, field_path)
         self.assertIsNone(root.find('dummy__path'))
         self.assertTrue(root.find('').is_root)
-        self.assertEqual(len(root.findall('model_c__modelb')), 4)
+        self.assertEqual(len(root.findall('model_c__modelb')), 5)
 
         # render and show
         self.assertIn(nodes[4].verbose_label, root.render())

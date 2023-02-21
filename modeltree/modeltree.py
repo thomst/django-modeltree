@@ -126,18 +126,13 @@ class ModelTree(AnyNode):
         return fields
 
     def _field_is_valid(self, field):
-        if field.remote_field is self.field:
-            return False
-
-        is_remote = lambda f: any(isinstance(f, t) for t in REMOTE_RELATION_TYPES)
-        if field.related_model is self.model and is_remote(field):
-            return False
-
-        field_path = (self.field_path + '__' + field.name).strip('_')
+        field_path = '__'.join([self.field_path, field.name]).strip('_')
         if self._options and not field_path in self._options:
             return False
-
-        return True
+        elif field.remote_field is self.field:
+            return False
+        else:
+            return True
 
     def _build_tree(self):
         if self.depth < self.MAX_DEPTH:
