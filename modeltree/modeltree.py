@@ -72,7 +72,7 @@ class ModelTree(AnyNode):
     def findall(self, value, key='field_path'):
         return findall(self, lambda n: value in getattr(n, key))
 
-    def iter(self, maxlevel=None, group=False, has_items=False):
+    def iterate(self, maxlevel=None, group=False, has_items=False):
         if has_items:
             filter = lambda n: bool(n.items)
         else:
