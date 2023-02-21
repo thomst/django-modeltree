@@ -11,8 +11,24 @@ ORIGINAL_RELATION_TYPES = (
 REMOTE_RELATION_TYPES = (
     models.OneToOneRel,
     models.ManyToOneRel,
+    models.ManyToManyRel,
+)
+ONETO_RELATION_TYPES = (
+    models.OneToOneField,
+    models.ForeignKey,
+    models.OneToOneRel,
+)
+MANYTO_RELATION_TYPES = (
+    models.ManyToManyField,
+    models.ManyToOneRel,
     models.ManyToManyRel
 )
+RELATION_STYLE = [
+    'one_to_one',
+    'one_to_many',
+    'many_to_one',
+    'many_to_many',
+]
 RELATION_TYPES = ORIGINAL_RELATION_TYPES + REMOTE_RELATION_TYPES
 
 
@@ -39,7 +55,15 @@ class ModelTree(AnyNode):
             return '{} -> {}'.format(self.field.name, self.model_name)
         else:
             return str(self.model_name)
- 
+
+    @property
+    def verbose_label(self):
+        if self.field:
+            relation_type = [t for t in RELATION_STYLE if getattr(self.field, t)][0]
+            return '[{}] {}.{} => {}'.format(relation_type, self.parent.model_name, self.field.name, self.model_name)
+        else:
+            return str(self.model_name)
+
     @property
     def label_path(self):
         return '.'.join(n.label for n in self.path)
