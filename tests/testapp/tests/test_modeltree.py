@@ -73,7 +73,6 @@ class ModelTreeTestCase(TestCase):
     def test_05_items(self):
         items = ModelA.objects.filter(pk__in=range(22))
         root = ModelTreeWithOptions(ModelA, items=items)
-        # print(RenderTree(root).by_attr('field_path'))
         self.assertEqual(len(list(LevelOrderIter(root))[0].items), 22)
         self.assertEqual(len(list(LevelOrderIter(root))[1].items), 14)
         self.assertEqual(len(list(LevelOrderIter(root))[2].items), 18)
@@ -82,12 +81,27 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(list(LevelOrderIter(root))[5].items), 0)
         self.assertEqual(len(list(LevelOrderIter(root))[6].items), 4)
 
-        # items = ModelA.objects.filter(pk__in=range(12, 16))
-        # root = ModelTreeWithOptions(ModelA, items=items)
-        # self.assertEqual(len(list(LevelOrderIter(root))[0].items), 4)
-        # self.assertEqual(len(list(LevelOrderIter(root))[1].items), 2)
-        # self.assertEqual(len(list(LevelOrderIter(root))[2].items), 6)
-        # self.assertEqual(len(list(LevelOrderIter(root))[3].items), 0)
-        # self.assertEqual(len(list(LevelOrderIter(root))[4].items), 0)
-        # self.assertEqual(len(list(LevelOrderIter(root))[5].items), 0)
-        # self.assertEqual(len(list(LevelOrderIter(root))[6].items), 0)
+        # Manually create set of objects of node 'model_d__modelc__modela'
+        # and compare the node items with the manually retreived objects.
+        root.show('verbose_label')
+        node = root.find('model_d__modelc__modela')
+        objs_d = set()
+        for item in items:
+            objs_d.update(set(item.model_d.all()))
+        objs_c = set()
+        for obj_d in objs_d:
+            objs_c.update(set(obj_d.modelc_set.all()))
+        objs_a = set()
+        for obj_c in objs_c:
+            objs_a.update(set(obj_c.modela_set.all()))
+        self.assertListEqual(list(node.items), list(objs_a))
+
+        items = ModelA.objects.filter(pk__in=range(12, 16))
+        root = ModelTreeWithOptions(ModelA, items=items)
+        self.assertEqual(len(list(LevelOrderIter(root))[0].items), 4)
+        self.assertEqual(len(list(LevelOrderIter(root))[1].items), 2)
+        self.assertEqual(len(list(LevelOrderIter(root))[2].items), 6)
+        self.assertEqual(len(list(LevelOrderIter(root))[3].items), 0)
+        self.assertEqual(len(list(LevelOrderIter(root))[4].items), 0)
+        self.assertEqual(len(list(LevelOrderIter(root))[5].items), 0)
+        self.assertEqual(len(list(LevelOrderIter(root))[6].items), 0)
