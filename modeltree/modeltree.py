@@ -56,7 +56,7 @@ class ModelTree(AnyNode):
         if self._items is None and not self.root._items is None:
             query = self.field.remote_field.name + '__pk__in'
             item_ids = [i.pk for i in self.parent.items.all()]
-            self._items = self.model.objects.filter(**{query: item_ids})
+            self._items = self.model.objects.filter(**{query: item_ids}).distinct()
         return self._items
 
     def follow_this_field(self, field):

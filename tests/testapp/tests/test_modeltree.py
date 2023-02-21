@@ -78,7 +78,7 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(list(LevelOrderIter(root))[1].items), 14)
         self.assertEqual(len(list(LevelOrderIter(root))[2].items), 18)
         self.assertEqual(len(list(LevelOrderIter(root))[3].items), 4)
-        self.assertEqual(len(list(LevelOrderIter(root))[4].items), 12)
+        self.assertEqual(len(list(LevelOrderIter(root))[4].items), 6)
         self.assertEqual(len(list(LevelOrderIter(root))[5].items), 0)
         self.assertEqual(len(list(LevelOrderIter(root))[6].items), 4)
 
