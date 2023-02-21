@@ -5,45 +5,16 @@ from anytree import LevelOrderIter
 from anytree import LevelOrderGroupIter
 from anytree import find
 from anytree import findall
-from django.db import models
-
-
-ORIGINAL_RELATION_TYPES = (
-    models.OneToOneField,
-    models.ForeignKey,
-    models.ManyToManyField,
-)
-REMOTE_RELATION_TYPES = (
-    models.OneToOneRel,
-    models.ManyToOneRel,
-    models.ManyToManyRel,
-)
-ONETO_RELATION_TYPES = (
-    models.OneToOneField,
-    models.ForeignKey,
-    models.OneToOneRel,
-)
-MANYTO_RELATION_TYPES = (
-    models.ManyToManyField,
-    models.ManyToOneRel,
-    models.ManyToManyRel
-)
-RELATION_STYLE = [
-    'one_to_one',
-    'one_to_many',
-    'many_to_one',
-    'many_to_many',
-]
-RELATION_TYPES = ORIGINAL_RELATION_TYPES + REMOTE_RELATION_TYPES
 
 
 class ModelTree(AnyNode):
     """
     A node based tree describing a model and its recursive relations.
     """
-    RELATION_TYPES = RELATION_TYPES
-    OPTIONS = list()
     MAX_DEPTH = 3
+    RELATION_TYPES = None
+    FIELD_TYPES = None
+    FIELD_PATHS = None
 
     def __init__(self, model, items=None, field=None, **kwargs):
         super().__init__(**kwargs)
@@ -51,7 +22,6 @@ class ModelTree(AnyNode):
         self.model_name = model._meta.object_name
         self.field = field
         self._items = items
-        self._options = self._get_options()
         self._build_tree()
 
     @property
@@ -64,7 +34,8 @@ class ModelTree(AnyNode):
     @property
     def verbose_label(self):
         if self.field:
-            relation_type = [t for t in RELATION_STYLE if getattr(self.field, t)][0]
+            relation_types = ['one_to_one', 'one_to_many', 'many_to_one', 'many_to_many']
+            relation_type = [t for t in relation_types if getattr(self.field, t)][0]
             return '[{}] {}.{} => {}'.format(relation_type, self.parent.model_name, self.field.name, self.model_name)
         else:
             return str(self.model_name)
@@ -111,31 +82,34 @@ class ModelTree(AnyNode):
         else:
             return LevelOrderIter(self, maxlevel=maxlevel, filter_=filter)
 
-    def _get_options(self):
-        options = set()
-        for option in self.OPTIONS:
-            splitted = option.split('__')
+    def _follow_this_path(self, field):
+        allowed_paths = set()
+        for path in self.FIELD_PATHS:
+            splitted = path.split('__')
             for i in range(len(splitted)):
-                options.add('__'.join(splitted[:i+1]))
-        return list(options)
+                allowed_paths.add('__'.join(splitted[:i+1]))
+        this_path = '__'.join([self.field_path, field.name]).strip('_')
+        return this_path in allowed_paths
 
-    def _get_relation_fields(self):
-        fields = self.model._meta.get_fields()
-        check_type = lambda f: any(issubclass(type(f), r) for r in self.RELATION_TYPES)
-        fields = [f for f in fields if check_type(f)]
-        return fields
-
-    def _field_is_valid(self, field):
+    def _follow_this_field(self, field):
+        # field_path is '' for root node. Therefor we use a strip.
         field_path = '__'.join([self.field_path, field.name]).strip('_')
-        if self._options and not field_path in self._options:
+
+        if not field.is_relation:
             return False
         elif field.remote_field is self.field:
+            return False
+        elif self.RELATION_TYPES and not any(getattr(field, t) for t in self.RELATION_TYPES):
+            return False
+        elif self.FIELD_TYPES and not any(isinstance(field, t) for t in self.FIELD_TYPES):
+            return False
+        elif self.FIELD_PATHS and not self._follow_this_path(field):
             return False
         else:
             return True
 
     def _build_tree(self):
         if self.depth < self.MAX_DEPTH:
-            for field in self._get_relation_fields():
-                if self._field_is_valid(field):
+            for field in self.model._meta.get_fields():
+                if self._follow_this_field(field):
                     self.__class__(model=field.related_model, field=field, parent=self)

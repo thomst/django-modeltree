@@ -9,14 +9,14 @@ from testapp.models import ModelA, ModelB, ModelC, ModelD, ModelE
 from testapp.management.commands.createtestdata import create_test_data
 
 
-class ModelTreeWithOptions(ModelTree):
-    OPTIONS = [
+class TreeWithFieldPaths(ModelTree):
+    FIELD_PATHS = [
         'model_c__modelb__model_b',
         'model_d__modelc__modela',
     ]
 
 
-class ModelTreeWithMaxDepth(ModelTree):
+class TreeWithMaxDepth(ModelTree):
     MAX_DEPTH = 1
 
 
@@ -43,7 +43,7 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelE)), 9)
 
     def test_03_tree_with_options(self):
-        root = ModelTreeWithOptions(ModelA)
+        root = TreeWithFieldPaths(ModelA)
         self.assertEqual(len(list(root.iter())), 7)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 2)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 2)
@@ -53,7 +53,7 @@ class ModelTreeTestCase(TestCase):
 
 
     def test_04_tree_with_max_depth(self):
-        root = ModelTreeWithMaxDepth(ModelA)
+        root = TreeWithMaxDepth(ModelA)
         self.assertEqual(len(list(root.iter())), 4)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 1)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 1)
@@ -63,7 +63,7 @@ class ModelTreeTestCase(TestCase):
 
     def test_05_count_items(self):
         items = ModelA.objects.filter(pk__in=range(22))
-        root = ModelTreeWithOptions(ModelA, items=items)
+        root = TreeWithFieldPaths(ModelA, items=items)
         self.assertEqual(len(list(root.iter())[0].items), 22)
         self.assertEqual(len(list(root.iter())[1].items), 14)
         self.assertEqual(len(list(root.iter())[2].items), 18)
@@ -73,7 +73,7 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(list(root.iter())[6].items), 4)
 
         items = ModelA.objects.filter(pk__in=range(12, 16))
-        root = ModelTreeWithOptions(ModelA, items=items)
+        root = TreeWithFieldPaths(ModelA, items=items)
         self.assertEqual(len(list(root.iter())[0].items), 4)
         self.assertEqual(len(list(root.iter())[1].items), 2)
         self.assertEqual(len(list(root.iter())[2].items), 6)
@@ -87,7 +87,7 @@ class ModelTreeTestCase(TestCase):
         # and compare the node items with the manually retreived objects.
         # root.show()
         items = ModelA.objects.filter(pk__in=range(22))
-        root = ModelTreeWithOptions(ModelA, items=items)
+        root = TreeWithFieldPaths(ModelA, items=items)
         node = root.find('model_d__modelc__modela')
         objs_d = set()
         for obj_a in items:
@@ -114,7 +114,7 @@ class ModelTreeTestCase(TestCase):
 
         # iter with has_items
         items = ModelA.objects.filter(pk__in=range(12, 16))
-        root = ModelTreeWithOptions(ModelA, items=items)
+        root = TreeWithFieldPaths(ModelA, items=items)
         nodes = list(root.iter(has_items=True))
         self.assertEqual(len(nodes), 3)
 
