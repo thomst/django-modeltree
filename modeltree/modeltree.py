@@ -20,10 +20,45 @@ class ModelTree(AnyNode):
     def __init__(self, model, items=None, field=None, **kwargs):
         super().__init__(**kwargs)
         self.model = model
-        self.model_name = model._meta.object_name
         self.field = field
         self._items = items
         self._build_tree()
+
+    @property
+    def model_name(self):
+        """
+        Class name of the node's :attr:`.model`.
+        """
+        return self.model._meta.object_name
+
+    @property
+    def field_name(self):
+        """
+        Name attribute of the node's :attr:`.field`.
+        This is None for the root node.
+        """
+        return self.field.name if self.field else None
+
+    @property
+    def field_type(self):
+        """
+        Type of the :attr:`.field`.
+        This is None for the root node.
+        """
+        return type(self.field) if self.field else None
+
+    @property
+    def relation_type(self):
+        """
+        String describing the relation type of :attr:`.field`.
+        See :attr:`.RELATION_TYPES` for possible values.
+        This is None for the root node.
+        """
+        if self.field:
+            relation_types = ['one_to_one', 'one_to_many', 'many_to_one', 'many_to_many']
+            return [t for t in relation_types if getattr(self.field, t)][0]
+        else:
+            return None
 
     @property
     def label(self):
