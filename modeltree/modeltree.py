@@ -10,14 +10,134 @@ from anytree import findall
 
 class ModelTree(AnyNode):
     """
-    A node based tree describing a model and its recursive relations.
+    A node based tree describing a model and its recursive relations. Guess you
+    have these models::
+
+        class ModelOne(models.Model):
+            model_two = models.ManyToManyField(
+                'ModelTwo',
+                related_name='model_one',
+                blank=True)
+
+        class ModelTwo(models.Model):
+            model_three = models.ForeignKey(
+                'ModelThree',
+                related_name='model_two',
+                blank=True, null=True,
+                on_delete=models.SET_NULL)
+
+        class ModelThree(models.Model):
+            pass
+
+        class ModelFour(models.Model):
+            model_three = models.OneToOneField(
+                'ModelThree',
+                related_name='model_four',
+                blank=True, null=True,
+                on_delete=models.SET_NULL)
+
+        class ModelFive(models.Model):
+            model_two = models.ManyToManyField(
+                'ModelThree',
+                related_name='model_five',
+                blank=True)
+
+    then a tree representing these models will look like::
+
+        >>> tree = ModelTree(ModelOne)
+        >>> tree.show()
+        ModelOne
+        └── [many_to_many] ModelOne.model_two => ModelTwo
+            └── [many_to_one] ModelTwo.model_three => ModelThree
+                ├── [one_to_one] ModelThree.model_four => ModelFour
+                └── [many_to_many] ModelThree.model_five => ModelFive
+
+    or rendered with the :attr:`.field_path` reference::
+
+        >>> tree = ModelTree(ModelOne)
+        >>> tree.show('field_path')
+        root
+        └── model_two
+            └── model_two__model_three
+                ├── model_two__model_three__model_four
+                └── model_two__model_three__model_five
+
+    This specific model tree will be used as base for all code examples within
+    this document.
     """
+
     MAX_DEPTH = 3
+    """
+    Max depth of the tree structure
+    """
+
     RELATION_TYPES = None
+    """
+    A list of relations types as strings to follow when building the tree.
+    By default all relations types will be followed. Types might be::
+
+        RELATION_TYPES = [
+            'one_to_one',
+            'one_to_many',
+            'many_to_one',
+            'many_to_many',
+        ]
+    """
+
     FIELD_TYPES = None
+    """
+    A list of field types to follow when building the tree.
+    By default all field types will be followed. Types might be::
+
+        FIELD_TYPES = [
+            models.OneToOneField,
+            models.OneToOneRel,
+            models.ForeignKey,
+            models.ManyToOneRel,
+            models.ManyToManyField,
+            models.ManyToManyRel,
+        ]
+    """
+
     FIELD_PATHS = None
+    """
+    A list of :attr:`.field_path`s to follow when building the tree.
+    Intermediated field-paths will be complemented. Guess you have this
+    field-path specified::
+
+        FIELD_PATHS = [
+            'model_two__model_three__model_four',
+        ]
+
+    Then in effect the tree will be build by following these paths altogether:
+
+    * model_two
+    * model_two__model_three
+    * model_two__model_three__model_four
+
+    By default all field-paths will be followed.
+    """
 
     def __init__(self, model, items=None, field=None, **kwargs):
+        """
+        To Build a tree you simply pass in the model the tree should be rooted
+        to::
+
+            tree = ModelTree(ModelOne)
+
+        Optionally you can pass in a queryset of your model::
+
+            items = ModelOne.objects.all()
+            tree = ModelTree(ModelOne, items)
+
+        Every node then will be equipped by the :attr:`.items` of the node's
+        :attr:`.model` that are related to the items of the tree's root model.
+
+        Parameters
+        ----------
+        model : obj of :class:`django.db.models.Model`
+        items : obj of :class:`django.db.models.query.QuerySet` (optional)
+        """
         super().__init__(**kwargs)
         self.model = model
         self.field = field
@@ -81,6 +201,19 @@ class ModelTree(AnyNode):
 
     @property
     def label(self):
+        """
+        String describing the field-model relation::
+
+            >>> node_two = tree.get('model_two')
+            >>> node_two.label
+            'model_two -> ModelTwo'
+
+        Since the root node has no field assigned it only shows the class name
+        of its model::
+
+            >>> tree.root.label
+            'ModelOne'
+        """
         if self.field:
             return '{} -> {}'.format(self.field.name, self.model_name)
         else:
@@ -88,6 +221,20 @@ class ModelTree(AnyNode):
 
     @property
     def verbose_label(self):
+        """
+        String describing the field-model relation including the relation-type
+        and the parent-model::
+
+            >>> node_two = tree.get('model_two')
+            >>> node_two.verbose_label
+            '[many_to_many] ModelOne.model_two => ModelTwo'
+
+        Since the root node has no field assigned it only shows the class name
+        of its model::
+
+            >>> tree.root.verbose_label
+            'ModelOne'
+        """
         if self.field:
             relation_types = ['one_to_one', 'one_to_many', 'many_to_one', 'many_to_many']
             relation_type = [t for t in relation_types if getattr(self.field, t)][0]
@@ -97,14 +244,41 @@ class ModelTree(AnyNode):
 
     @property
     def label_path(self):
+        """
+        String describing the node's :attr:`.path` with :attr:`.label`s::
+
+            >>> node_three = list(tree.iterate())[2]
+            >>> node_three.label_path
+            'ModelOne.model_two -> ModelTwo.model_three -> ModelThree'
+        """
         return '.'.join(n.label for n in self.path)
 
     @property
     def model_path(self):
+        """
+        String describing the node's :attr:`.path` with :attr:`.model_name`s::
+
+            >>> node_three = list(tree.iterate())[2]
+            >>> node_three.model_path
+            'ModelOne -> ModelTwo -> ModelThree'
+        """
         return ' -> '.join(n.model_name for n in self.path)
 
     @property
     def field_path(self):
+        """
+        String describing the node's :attr:`.path` with :attr:`.field_name`s::
+
+            >>> node_four = list(tree.iterate())[3]
+            >>> node_four.field_path
+            'model_two__model_three__model_four'
+
+        Since the root-modelnode has no field by its own it is represented by
+        the string 'root'::
+
+            >>> tree.root.field_path
+            'root'
+        """
         if self.is_root:
             return 'root'
         else:
@@ -112,6 +286,29 @@ class ModelTree(AnyNode):
 
     @property
     def items(self):
+        """
+        If the ModelTree was initiated with a :class:`django.db.query.QuerySet`
+        it will be the :attr:`.items` attribute of the root node. All child
+        nodes hold a queryset of elements that are derived of the initial one::
+
+            >>> items_one = ModelOne.objects.all().values_list('pk', flat=True)
+            >>> items_two = ModelTwo.objects.filter(
+            ...     model_one__pk__in=items_one).values_list('pk', flat=True)
+            >>> items_three = ModelThree.objects.filter(
+            ...     model_two__pk__in=items_two)
+            >>> tree = ModelTree(ModelOne, items_one)
+            >>> node_three = tree.get('model_two__model_three')
+            >>> list(node_three.items) == list(items_three)
+            True
+
+        Items of a node are lazy. Querysets are evaluated not until an items
+        attribute is accessed. And only for those nodes that link the current
+        one with the root node. For each of those nodes the database will be hit
+        once.
+
+        If no queryset was passed for ModelTree initiation, then items of all
+        nodes will be `None`.
+        """
         if self._items is None and not self.root._items is None:
             query = self.field.remote_field.name + '__pk__in'
             item_ids = [i.pk for i in self.parent.items.all()]
@@ -119,9 +316,24 @@ class ModelTree(AnyNode):
         return self._items
 
     def render(self, key='verbose_label'):
+        """
+        This is just a wrapper for the :class:`anytree.RenderTree`::
+
+            >>> from anytree import RenderTree
+            >>> tree = ModelTree(ModelOne)
+            >>> tree.render(key='field_path') == RenderTree(tree).by_attr('field_path')
+            True
+
+        Parameters
+        ----------
+        key : node attribute as string
+        """
         return (RenderTree(self).by_attr(key))
 
     def show(self, key='verbose_label'):
+        """
+        Simply a print statement for a rendered tree: `print(tree.render())`
+        """
         print(self.render(key))
 
     def get(self, name=None, **params):
@@ -146,6 +358,8 @@ class ModelTree(AnyNode):
         return findall(self, lambda n: pattern in getattr(n, key))
 
     def iterate(self, by_level=False, by_grouped_level=False, maxlevel=None, has_items=False, filter=None):
+        """
+        """
         filters = list(filter) if filter else list()
         if has_items:
             filters.append(lambda n: bool(n.items))
