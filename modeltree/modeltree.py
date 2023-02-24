@@ -328,7 +328,7 @@ class ModelTree(AnyNode):
         ----------
         key : node attribute as string
         """
-        return (RenderTree(self).by_attr(key))
+        return RenderTree(self).by_attr(key)
 
     def show(self, key='verbose_label'):
         """
