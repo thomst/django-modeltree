@@ -333,6 +333,7 @@ class ModelTree(AnyNode):
 
     def get(self, name=None, **params):
         """
+        Get a node by its name or specific attributes.
         """
         if not name is None:
             params['name'] = name
@@ -341,17 +342,21 @@ class ModelTree(AnyNode):
 
     def find(self, **params):
         """
+        Find nodes by specific attributes
         """
         filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
         return findall(self, filter)
 
     def grep(self, pattern, key='name'):
         """
+        Grep nodes by a pattern that matches a specific attribute. The
+        attribute's value must be of type string.
         """
         return findall(self, lambda n: pattern in getattr(n, key))
 
     def iterate(self, by_level=False, by_grouped_level=False, maxlevel=None, has_items=False, filter=None):
         """
+        Return a tree iterator.
         """
         filters = list(filter) if filter else list()
         if has_items:
