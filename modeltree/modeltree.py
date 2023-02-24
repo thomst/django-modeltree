@@ -339,11 +339,9 @@ class ModelTree(AnyNode):
         filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
         return find(self, filter)
 
-    def find(self, name=None, **params):
+    def find(self, **params):
         """
         """
-        if not name is None:
-            params['name'] = name
         filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
         return findall(self, filter)
 
