@@ -43,7 +43,7 @@ class ModelTreeTestCase(TestCase):
 
     def test_01_node(self):
         root = ModelTree(ModelA)
-        node = root.find('model_c__modelb__model_b')
+        node = root.get('model_c__modelb__model_b')
         self.assertEqual(node.label, 'model_b -> ModelB')
         self.assertEqual(node.verbose_label, '[one_to_one] ModelB.model_b => ModelB')
         self.assertEqual(node.field_path, 'model_c__modelb__model_b')
@@ -127,7 +127,7 @@ class ModelTreeTestCase(TestCase):
         # root.show()
         items = ModelA.objects.filter(pk__in=range(22))
         root = TreeWithFieldPaths(ModelA, items=items)
-        node = root.find('model_d__modelc__modela')
+        node = root.get('model_d__modelc__modela')
         objs_d = set()
         for obj_a in items:
             objs_d.update(set(obj_a.model_d.all()))
@@ -155,14 +155,24 @@ class ModelTreeTestCase(TestCase):
         nodes = list(root.iterate(has_items=True))
         self.assertEqual(len(nodes), 3)
 
-        # find and findall
+        # get
         root = ModelTree(ModelA)
-        nodes = list(root.iterate())
+        nodes = list(root.iterate(by_level=True))
         field_path = nodes[6].field_path
-        self.assertEqual(root.find(field_path).field_path, field_path)
-        self.assertIsNone(root.find('dummy__path'))
-        self.assertTrue(root.find('').is_root)
-        self.assertEqual(len(root.findall('model_c__modelb')), 5)
+        self.assertEqual(root.get(field_path).field_path, field_path)
+        self.assertIsNone(root.get('dummy__path'))
+        self.assertTrue(root.get('root').is_root)
+        self.assertRaises(CountError, root.get, model=ModelC)
+
+        # find
+        self.assertEqual(len(root.find(field_type=models.ManyToManyField)), 5)
+        self.assertEqual(len(root.find(model=ModelC)), 7)
+
+        # grep
+        self.assertEqual(len(root.grep('model_c__modelb')), 5)
+        self.assertEqual(len(root.grep('ModelB', key='label')), 11)
+        for node in root.grep('ModelB', key='label'):
+            self.assertTrue('ModelB' in node.label)
 
         # render and show
         self.assertIn(nodes[4].verbose_label, root.render())

@@ -102,11 +102,26 @@ class ModelTree(AnyNode):
     def show(self, key='verbose_label'):
         print(self.render(key))
 
-    def find(self, value, key='field_path'):
-        return find(self, lambda n: getattr(n, key) == value)
+    def get(self, field_path=None, **params):
+        """
+        """
+        if not field_path is None:
+            params['field_path'] = field_path
+        filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
+        return find(self, filter)
 
-    def findall(self, value, key='field_path'):
-        return findall(self, lambda n: value in getattr(n, key))
+    def find(self, field_path=None, **params):
+        """
+        """
+        if not field_path is None:
+            params['field_path'] = field_path
+        filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
+        return findall(self, filter)
+
+    def grep(self, pattern, key='field_path'):
+        """
+        """
+        return findall(self, lambda n: pattern in getattr(n, key))
 
     def iterate(self, by_level=False, by_grouped_level=False, maxlevel=None, has_items=False, filter=None):
         filters = list(filter) if filter else list()
