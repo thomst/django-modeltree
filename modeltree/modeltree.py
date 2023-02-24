@@ -25,6 +25,25 @@ class ModelTree(AnyNode):
         self._build_tree()
 
     @property
+    def name(self):
+        """
+        A unique name as a identifier of the node. Since the :attr:`.field_path`
+        is the most compact and unique value describing a node it serves best
+        as the node's name attribute::
+
+            >>> node = tree.get('model_two__model_three')
+            >>> node.name == node.field_path
+            True
+
+        The name of the root node which has no field by its own is simply the
+        string 'root'::
+
+            >>> tree.root.name
+            'root'
+        """
+        return self.field_path
+
+    @property
     def model_name(self):
         """
         Class name of the node's :attr:`.model`.
@@ -105,23 +124,23 @@ class ModelTree(AnyNode):
     def show(self, key='verbose_label'):
         print(self.render(key))
 
-    def get(self, field_path=None, **params):
+    def get(self, name=None, **params):
         """
         """
-        if not field_path is None:
-            params['field_path'] = field_path
+        if not name is None:
+            params['name'] = name
         filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
         return find(self, filter)
 
-    def find(self, field_path=None, **params):
+    def find(self, name=None, **params):
         """
         """
-        if not field_path is None:
-            params['field_path'] = field_path
+        if not name is None:
+            params['name'] = name
         filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
         return findall(self, filter)
 
-    def grep(self, pattern, key='field_path'):
+    def grep(self, pattern, key='name'):
         """
         """
         return findall(self, lambda n: pattern in getattr(n, key))
