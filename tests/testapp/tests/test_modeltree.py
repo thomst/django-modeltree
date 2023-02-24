@@ -54,7 +54,7 @@ class ModelTreeTestCase(TestCase):
 
     def test_02_tree(self):
         root = ModelTree(ModelA)
-        self.assertEqual(len(list(root.iterate())), 39)
+        self.assertEqual(len(list(root.iterate(by_level=True))), 39)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 7)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 11)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 7)
@@ -63,7 +63,7 @@ class ModelTreeTestCase(TestCase):
 
     def test_03_tree_with_field_paths(self):
         root = TreeWithFieldPaths(ModelA)
-        self.assertEqual(len(list(root.iterate())), 7)
+        self.assertEqual(len(list(root.iterate(by_level=True))), 7)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 2)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 2)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 2)
@@ -73,7 +73,7 @@ class ModelTreeTestCase(TestCase):
 
     def test_04_tree_with_field_types(self):
         root = TreeWithFieldTypes(ModelA)
-        self.assertEqual(len(list(root.iterate())), 9)
+        self.assertEqual(len(list(root.iterate(by_level=True))), 9)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 1)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 3)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 1)
@@ -83,7 +83,7 @@ class ModelTreeTestCase(TestCase):
 
     def test_05_tree_with_relation_types(self):
         root = TreeWithRelationTypes(ModelA)
-        self.assertEqual(len(list(root.iterate())), 4)
+        self.assertEqual(len(list(root.iterate(by_level=True))), 4)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 1)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 1)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 1)
@@ -93,7 +93,7 @@ class ModelTreeTestCase(TestCase):
 
     def test_06_tree_with_max_depth(self):
         root = TreeWithMaxDepth(ModelA)
-        self.assertEqual(len(list(root.iterate())), 4)
+        self.assertEqual(len(list(root.iterate(by_level=True))), 4)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelA)), 1)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelB)), 1)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 1)
@@ -103,23 +103,23 @@ class ModelTreeTestCase(TestCase):
     def test_07_count_items(self):
         items = ModelA.objects.filter(pk__in=range(22))
         root = TreeWithFieldPaths(ModelA, items=items)
-        self.assertEqual(len(list(root.iterate())[0].items), 22)
-        self.assertEqual(len(list(root.iterate())[1].items), 14)
-        self.assertEqual(len(list(root.iterate())[2].items), 18)
-        self.assertEqual(len(list(root.iterate())[3].items), 4)
-        self.assertEqual(len(list(root.iterate())[4].items), 6)
-        self.assertEqual(len(list(root.iterate())[5].items), 0)
-        self.assertEqual(len(list(root.iterate())[6].items), 4)
+        self.assertEqual(len(list(root.iterate(by_level=True))[0].items), 22)
+        self.assertEqual(len(list(root.iterate(by_level=True))[1].items), 14)
+        self.assertEqual(len(list(root.iterate(by_level=True))[2].items), 18)
+        self.assertEqual(len(list(root.iterate(by_level=True))[3].items), 4)
+        self.assertEqual(len(list(root.iterate(by_level=True))[4].items), 6)
+        self.assertEqual(len(list(root.iterate(by_level=True))[5].items), 0)
+        self.assertEqual(len(list(root.iterate(by_level=True))[6].items), 4)
 
         items = ModelA.objects.filter(pk__in=range(12, 16))
         root = TreeWithFieldPaths(ModelA, items=items)
-        self.assertEqual(len(list(root.iterate())[0].items), 4)
-        self.assertEqual(len(list(root.iterate())[1].items), 2)
-        self.assertEqual(len(list(root.iterate())[2].items), 6)
-        self.assertEqual(len(list(root.iterate())[3].items), 0)
-        self.assertEqual(len(list(root.iterate())[4].items), 0)
-        self.assertEqual(len(list(root.iterate())[5].items), 0)
-        self.assertEqual(len(list(root.iterate())[6].items), 0)
+        self.assertEqual(len(list(root.iterate(by_level=True))[0].items), 4)
+        self.assertEqual(len(list(root.iterate(by_level=True))[1].items), 2)
+        self.assertEqual(len(list(root.iterate(by_level=True))[2].items), 6)
+        self.assertEqual(len(list(root.iterate(by_level=True))[3].items), 0)
+        self.assertEqual(len(list(root.iterate(by_level=True))[4].items), 0)
+        self.assertEqual(len(list(root.iterate(by_level=True))[5].items), 0)
+        self.assertEqual(len(list(root.iterate(by_level=True))[6].items), 0)
 
     def test_08_compare_items(self):
         # Manually create set of objects of node 'model_d__modelc__modela'
@@ -144,14 +144,12 @@ class ModelTreeTestCase(TestCase):
         root = ModelTree(ModelA)
         nodes = list(root.iterate())
         self.assertEqual(len(nodes), 39)
-
-        # iterate with group
-        nodes = list(root.iterate(group=True))
+        nodes = list(root.iterate(by_level=True))
+        self.assertEqual(len(nodes), 39)
+        nodes = list(root.iterate(by_grouped_level=True))
         self.assertEqual(len(nodes), 4)
         nodes = list(root.iterate(has_items=True))
         self.assertEqual(len(nodes), 0)
-
-        # iterate with has_items
         items = ModelA.objects.filter(pk__in=range(12, 16))
         root = TreeWithFieldPaths(ModelA, items=items)
         nodes = list(root.iterate(has_items=True))

@@ -3,6 +3,7 @@ from anytree import AnyNode
 from anytree import RenderTree
 from anytree import LevelOrderIter
 from anytree import LevelOrderGroupIter
+from anytree import PreOrderIter
 from anytree import find
 from anytree import findall
 
@@ -72,15 +73,22 @@ class ModelTree(AnyNode):
     def findall(self, value, key='field_path'):
         return findall(self, lambda n: value in getattr(n, key))
 
-    def iterate(self, maxlevel=None, group=False, has_items=False):
+    def iterate(self, by_level=False, by_grouped_level=False, maxlevel=None, has_items=False, filter=None):
+        filters = list(filter) if filter else list()
         if has_items:
-            filter = lambda n: bool(n.items)
+            filters.append(lambda n: bool(n.items))
+
+        if filters:
+            filter = lambda n: all(f(n) for f in filters)
+
+        if by_level:
+            iter_class = LevelOrderIter
+        elif by_grouped_level:
+            iter_class = LevelOrderGroupIter
         else:
-            filter = None
-        if group:
-            return LevelOrderGroupIter(self, maxlevel=maxlevel, filter_=filter)
-        else:
-            return LevelOrderIter(self, maxlevel=maxlevel, filter_=filter)
+            iter_class = PreOrderIter
+
+        return iter_class(self, maxlevel=maxlevel, filter_=filter)
 
     def _follow_this_path(self, field):
         allowed_paths = set()
