@@ -150,9 +150,6 @@ class ModelTree(AnyNode):
         return this_path in allowed_paths
 
     def _follow_this_field(self, field):
-        # field_path is '' for root node. Therefor we use a strip.
-        field_path = '__'.join([self.field_path, field.name]).strip('_')
-
         if not field.is_relation:
             return False
         elif field.remote_field is self.field:
