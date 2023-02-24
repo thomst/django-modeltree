@@ -181,6 +181,8 @@ class ModelTreeTestCase(TestCase):
         self.assertIsInstance(root.render(), RenderTree)
         self.assertIn(nodes[4].field_path, root.render().by_attr('field_path'))
         self.assertIn(nodes[4].model_path, root.render().by_attr('model_path'))
+        self.assertIn(nodes[4].field_name, root.render().by_attr('field_name'))
+        self.assertIn(nodes[4].relation_type, root.render().by_attr('relation_type'))
         self.assertIn(nodes[4].label, root.render().by_attr('label'))
         with redirect_stdout(StringIO()) as stdout:
             root.show()
