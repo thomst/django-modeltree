@@ -86,7 +86,10 @@ class ModelTree(AnyNode):
 
     @property
     def field_path(self):
-        return '__'.join(n.field.name for n in self.path[1:])
+        if self.is_root:
+            return 'root'
+        else:
+            return '__'.join(n.field.name for n in self.path[1:])
 
     @property
     def items(self):
@@ -146,7 +149,10 @@ class ModelTree(AnyNode):
             splitted = path.split('__')
             for i in range(len(splitted)):
                 allowed_paths.add('__'.join(splitted[:i+1]))
-        this_path = '__'.join([self.field_path, field.name]).strip('_')
+        if self.is_root:
+            this_path = field.name
+        else:
+            this_path = '__'.join([self.field_path, field.name]).strip('_')
         return this_path in allowed_paths
 
     def _follow_this_field(self, field):
