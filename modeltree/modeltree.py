@@ -315,26 +315,21 @@ class ModelTree(AnyNode):
             self._items = self.model.objects.filter(**{query: item_ids}).distinct()
         return self._items
 
-    def render(self, key='verbose_label'):
+    def render(self):
         """
-        This is just a wrapper for the :class:`anytree.RenderTree`::
-
-            >>> from anytree import RenderTree
-            >>> tree = ModelTree(ModelOne)
-            >>> tree.render(key='field_path') == RenderTree(tree).by_attr('field_path')
-            True
-
-        Parameters
-        ----------
-        key : node attribute as string
+        Return a :class:`anytree.RenderTree` instance for `self`.
         """
-        return RenderTree(self).by_attr(key)
+        return RenderTree(self)
 
     def show(self, key='verbose_label'):
         """
-        Simply a print statement for a rendered tree: `print(tree.render())`
+        Print the tree using a specific attribute. 
+
+        Parameters
+        ----------
+        key: Attribute name the tree should be rendered with. (optional)
         """
-        print(self.render(key))
+        print(self.render().by_attr(key))
 
     def get(self, name=None, **params):
         """

@@ -4,7 +4,7 @@ from contextlib import redirect_stdout
 from django.test import TestCase
 from django.db import models
 from anytree import findall
-from anytree import find
+from anytree import RenderTree
 from anytree.search import CountError
 from modeltree import __version__
 from modeltree import ModelTree
@@ -178,10 +178,10 @@ class ModelTreeTestCase(TestCase):
             self.assertTrue('ModelB' in node.label)
 
         # render and show
-        self.assertIn(nodes[4].verbose_label, root.render())
-        self.assertIn(nodes[4].field_path, root.render('field_path'))
-        self.assertIn(nodes[4].model_path, root.render('model_path'))
-        self.assertIn(nodes[4].label, root.render('label'))
+        self.assertIsInstance(root.render(), RenderTree)
+        self.assertIn(nodes[4].field_path, root.render().by_attr('field_path'))
+        self.assertIn(nodes[4].model_path, root.render().by_attr('model_path'))
+        self.assertIn(nodes[4].label, root.render().by_attr('label'))
         with redirect_stdout(StringIO()) as stdout:
             root.show()
         self.assertIn(nodes[4].verbose_label, stdout.getvalue())
