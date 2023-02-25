@@ -30,14 +30,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build docs
-        shell: bash
-        run: |
-          cd docs/
-          make html
+        uses: ammaraskar/sphinx-action@master
+        with:
+          docs-folder: "docs/"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: docs/_build/html/
+          path: docs/build/html/
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
