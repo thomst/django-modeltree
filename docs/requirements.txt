@@ -3,3 +3,4 @@ sphinxcontrib-napoleon
 sphinx-rtd-theme
 Django
 anytree
+django-modeltree
