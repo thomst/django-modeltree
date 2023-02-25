@@ -30,9 +30,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build docs
-        uses: ammaraskar/sphinx-action@master
-        with:
-          docs-folder: "docs/"
+        shell: bash
+        run: |
+          cd docs/
+          make html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
