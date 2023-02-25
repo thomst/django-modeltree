@@ -13,7 +13,7 @@ class ModelTree(AnyNode):
     **What is a ModelTree?**
 
     A ModelTree describes a :class:`~django.db.models.Model` and all its
-    recursive relations to other models. It is :class:`~anytree.node.Node`
+    recursive relations to other models. It is :class:`~anytree.node.node.Node`
     based, iterable, walkable, searchable and can be populated by :attr:`.items`.
     
     Guess you have these models::
