@@ -11,6 +11,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
+from modeltree.__version__ import __version__
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -18,6 +19,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 project = 'django-modeltree'
 copyright = '2023, Thomas Leichtfuß'
 author = 'Thomas Leichtfuß'
+version = __version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

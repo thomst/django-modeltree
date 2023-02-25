@@ -3,11 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+Current version: |version|
+
+
 Welcome to django-modeltree's documentation!
 ============================================
 
 .. autoclass:: modeltree.ModelTree
-    :members:
+   :members:
 
 
 Indices and tables
