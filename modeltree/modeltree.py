@@ -264,6 +264,7 @@ class ModelTree(AnyNode):
     def field(self):
         """
         The relation field of the parent node's model leading to this node.
+        This is None for the root node.
         """
         return self._field
 
@@ -418,22 +419,33 @@ class ModelTree(AnyNode):
     def render(self):
         """
         Return a :class:`~anytree.render.RenderTree` instance for `self`.
+
+        :return: instance of :class:`~anytree.render.RenderTree`
         """
         return RenderTree(self)
 
     def show(self, key='verbose_label'):
         """
-        Print the tree using a specific attribute. 
+        Print a rendered tree using a specific attribute. 
 
-        Parameters
-        ----------
-        key: Attribute name the tree should be rendered with. (optional)
+        :param str key: attribute to be used to render the tree (optional)
         """
         print(self.render().by_attr(key))
 
     def get(self, name=None, **params):
         """
-        Get a node by its name or specific attributes.
+        Either lookup a node by its :attr:`.name` or pass in any number of
+        parameter to identify a specific node::
+
+            >>> tree = ModelTree(ModelOne)
+            >>> tree.get('model_two') == tree.get(model=ModelTwo)
+            True
+
+        :param str name: a node's :attr:`.name` (optional)
+        :params: any key value pair referencing to a node's attribute
+        :return: node object or None if no node matches the search parameters
+        :rtype: :class:`~modeltree.ModelTree` or None
+        :raises: :class:`~anytree.search.CountError`: if more than one node was found
         """
         if not name is None:
             params['name'] = name
@@ -442,7 +454,16 @@ class ModelTree(AnyNode):
 
     def find(self, **params):
         """
-        Find nodes by specific attributes
+        Find nodes by specific attributes::
+
+            >>> tree = ModelTree(ModelOne)
+            >>> len(tree.find(relation_type='many_to_many'))
+            2
+            >>> len(tree.find(field_type=models.OneToOneRel))
+            1
+
+        :params: any key value pair referencing to attributes of nodes
+        :return: tuple of nodes
         """
         filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
         return findall(self, filter)
@@ -450,7 +471,18 @@ class ModelTree(AnyNode):
     def grep(self, pattern, key='name'):
         """
         Grep nodes by a pattern that matches a specific attribute. The
-        attribute's value must be of type string.
+        attribute's value must be of type string. By default the :attr:`.name`
+        attribute of a node is used::
+
+            >>> tree = ModelTree(ModelOne)
+            >>> len(tree.grep('model_two'))
+            4
+            >>> len(tree.grep('many_to', key='relation_type'))
+            3
+
+        :param str pattern: a pattern matching a string attribute of the node
+        :param str key: name of the attribute to be tried
+        :return: tuple of nodes
         """
         return findall(self, lambda n: pattern in getattr(n, key))
 

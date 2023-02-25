@@ -190,6 +190,7 @@ class ModelTreeTestCase(TestCase):
 
     def test_10_docstrings(self):
         globs = dict(
+            models=models,
             ModelOne=ModelOne,
             ModelTwo=ModelTwo,
             ModelThree=ModelThree,
