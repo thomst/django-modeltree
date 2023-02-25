@@ -101,7 +101,7 @@ class ModelTree(AnyNode):
 
     FIELD_PATHS = None
     """
-    A list of :attr:`.field_path`s to follow when building the tree.
+    A list of :attr:`.field_path`\s to follow when building the tree.
     Intermediated field-paths will be complemented. Guess you have this
     field-path specified::
 
@@ -135,8 +135,8 @@ class ModelTree(AnyNode):
 
         Parameters
         ----------
-        model : obj of :class:`django.db.models.Model`
-        items : obj of :class:`django.db.models.query.QuerySet` (optional)
+        model : obj of :class:`~django.db.models.Model`
+        items : obj of :class:`~django.db.models.query.QuerySet` (optional)
         """
         super().__init__(**kwargs)
         self.model = model
@@ -245,7 +245,7 @@ class ModelTree(AnyNode):
     @property
     def label_path(self):
         """
-        String describing the node's :attr:`.path` with :attr:`.label`s::
+        String describing the node's :attr:`.path` with :attr:`.label`\s::
 
             >>> node_three = list(tree.iterate())[2]
             >>> node_three.label_path
@@ -256,7 +256,7 @@ class ModelTree(AnyNode):
     @property
     def model_path(self):
         """
-        String describing the node's :attr:`.path` with :attr:`.model_name`s::
+        String describing the node's :attr:`.path` with :attr:`.model_name`\s::
 
             >>> node_three = list(tree.iterate())[2]
             >>> node_three.model_path
@@ -267,7 +267,7 @@ class ModelTree(AnyNode):
     @property
     def field_path(self):
         """
-        String describing the node's :attr:`.path` with :attr:`.field_name`s::
+        String describing the node's :attr:`.path` with :attr:`.field_name`\s::
 
             >>> node_four = list(tree.iterate())[3]
             >>> node_four.field_path
@@ -287,7 +287,7 @@ class ModelTree(AnyNode):
     @property
     def items(self):
         """
-        If the ModelTree was initiated with a :class:`django.db.query.QuerySet`
+        If the ModelTree was initiated with a :class:`~django.db.models.query.QuerySet`
         it will be the :attr:`.items` attribute of the root node. All child
         nodes hold a queryset of elements that are derived of the initial one::
 
@@ -317,7 +317,7 @@ class ModelTree(AnyNode):
 
     def render(self):
         """
-        Return a :class:`anytree.RenderTree` instance for `self`.
+        Return a :class:`~anytree.render.RenderTree` instance for `self`.
         """
         return RenderTree(self)
 
