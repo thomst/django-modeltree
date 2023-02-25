@@ -334,7 +334,8 @@ class ModelTree(AnyNode):
     @property
     def label_path(self):
         """
-        String describing the node's :attr:`.path` with :attr:`.label`\s::
+        String describing the node's :attr:`~anytree.node.nodemixin.NodeMixin.path`
+        using the :attr:`.label` of nodes::
 
             >>> node_three = list(tree.iterate())[2]
             >>> node_three.label_path
@@ -345,7 +346,8 @@ class ModelTree(AnyNode):
     @property
     def model_path(self):
         """
-        String describing the node's :attr:`.path` with :attr:`.model_name`\s::
+        String describing the node's :attr:`~anytree.node.nodemixin.NodeMixin.path`
+        using the :attr:`.model_name` of nodes::
 
             >>> node_three = list(tree.iterate())[2]
             >>> node_three.model_path
@@ -356,7 +358,8 @@ class ModelTree(AnyNode):
     @property
     def field_path(self):
         """
-        String describing the node's :attr:`.path` with :attr:`.field_name`\s::
+        String describing the node's :attr:`~anytree.node.nodemixin.NodeMixin.path`
+        using the :attr:`.field_name` of nodes::
 
             >>> node_four = list(tree.iterate())[3]
             >>> node_four.field_path
