@@ -271,9 +271,9 @@ class ModelTree(AnyNode):
     def field_name(self):
         """
         Name attribute of the node's :attr:`.field`.
-        This is None for the root node.
+        This is an empty string for the root node.
         """
-        return self.field.name if self.field else None
+        return self.field.name if self.field else str()
 
     @property
     def field_type(self):
@@ -288,13 +288,13 @@ class ModelTree(AnyNode):
         """
         String describing the relation type of :attr:`.field`.
         See :attr:`.RELATION_TYPES` for possible values.
-        This is None for the root node.
+        This is an empty string for the root node.
         """
         if self.field:
             relation_types = ['one_to_one', 'one_to_many', 'many_to_one', 'many_to_many']
             return [t for t in relation_types if getattr(self.field, t)][0]
         else:
-            return None
+            return str()
 
     @property
     def label(self):
