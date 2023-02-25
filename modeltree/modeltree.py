@@ -165,8 +165,8 @@ class ModelTree(AnyNode):
 
     def __init__(self, model, items=None, field=None, **kwargs):
         super().__init__(**kwargs)
-        self.model = model
-        self.field = field
+        self._model = model
+        self._field = field
         self._items = items
         self._build_tree()
 
@@ -190,11 +190,25 @@ class ModelTree(AnyNode):
         return self.field_path
 
     @property
+    def model(self):
+        """
+        :class:`django.db.models.Model` of the node.
+        """
+        return self._model
+
+    @property
     def model_name(self):
         """
         Class name of the node's :attr:`.model`.
         """
         return self.model._meta.object_name
+
+    @property
+    def field(self):
+        """
+        The relation field of the parent node's model leading to this node.
+        """
+        return self._field
 
     @property
     def field_name(self):
