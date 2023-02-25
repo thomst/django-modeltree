@@ -10,8 +10,13 @@ from anytree import findall
 
 class ModelTree(AnyNode):
     """
-    A node based tree describing a model and its recursive relations. Guess you
-    have these models::
+    **What is a ModelTree?**
+
+    A ModelTree describes a :class:`~django.db.models.Model` and all its
+    recursive relations to other models. It is :class:`~anytree.node.Node`
+    based, iterable, walkable, searchable and can be populated by :attr:`.items`.
+    
+    Guess you have these models::
 
         class ModelOne(models.Model):
             model_two = models.ManyToManyField(
@@ -42,7 +47,7 @@ class ModelTree(AnyNode):
                 related_name='model_five',
                 blank=True)
 
-    then a tree representing these models will look like::
+    Then a tree representing these models will look like::
 
         >>> tree = ModelTree(ModelOne)
         >>> tree.show()
@@ -52,7 +57,7 @@ class ModelTree(AnyNode):
                 ├── [one_to_one] ModelThree.model_four => ModelFour
                 └── [many_to_many] ModelThree.model_five => ModelFive
 
-    or rendered with the :attr:`.field_path` reference::
+    Or rendered by using the :attr:`.field_path` attribute::
 
         >>> tree = ModelTree(ModelOne)
         >>> tree.show('field_path')
@@ -62,8 +67,48 @@ class ModelTree(AnyNode):
                 ├── model_two__model_three__model_four
                 └── model_two__model_three__model_five
 
-    This specific model tree will be used as base for all code examples within
-    this document.
+
+    **How to build a ModelTree?**
+
+    This is very easy. Simply pass in the model the tree should be rooted to::
+
+        tree = ModelTree(ModelOne)
+
+    Optionally you can pass in a queryset of your model. Every node then
+    will be populated by items of the node's :attr:`.model` that are related
+    to these initial items::
+
+        items = ModelOne.objects.all()
+        tree = ModelTree(ModelOne, items)
+
+    See the :attr:`.items` section for more information about how items are
+    processed.
+
+
+    **What if I don't want to follow all model relations?**
+
+    You can easily adjust the way your tree is build up. Therefore overwrite one
+    or more of the following class attributes:
+
+    * :attr:`.MAX_DEPTH`
+    * :attr:`.RELATION_TYPES`
+    * :attr:`.FIELD_TYPES`
+    * :attr:`.FIELD_PATHS`
+
+    Guess you whish to only follow specific relation-types::
+
+        >>> class MyModelTree(ModelTree):
+        ...     RELATION_TYPES = [
+        ...         'many_to_many',
+        ...         'many_to_one',
+        ...     ]
+        ...
+        >>> tree = MyModelTree(ModelOne)
+        >>> tree.show()
+        ModelOne
+        └── [many_to_many] ModelOne.model_two => ModelTwo
+            └── [many_to_one] ModelTwo.model_three => ModelThree
+                └── [many_to_many] ModelThree.model_five => ModelFive
     """
 
     MAX_DEPTH = 3
@@ -119,25 +164,6 @@ class ModelTree(AnyNode):
     """
 
     def __init__(self, model, items=None, field=None, **kwargs):
-        """
-        To Build a tree you simply pass in the model the tree should be rooted
-        to::
-
-            tree = ModelTree(ModelOne)
-
-        Optionally you can pass in a queryset of your model::
-
-            items = ModelOne.objects.all()
-            tree = ModelTree(ModelOne, items)
-
-        Every node then will be equipped by the :attr:`.items` of the node's
-        :attr:`.model` that are related to the items of the tree's root model.
-
-        Parameters
-        ----------
-        model : obj of :class:`~django.db.models.Model`
-        items : obj of :class:`~django.db.models.query.QuerySet` (optional)
-        """
         super().__init__(**kwargs)
         self.model = model
         self.field = field
@@ -303,8 +329,8 @@ class ModelTree(AnyNode):
 
         Items of a node are lazy. Querysets are evaluated not until an items
         attribute is accessed. And only for those nodes that link the current
-        one with the root node. For each of those nodes the database will be hit
-        once.
+        one with the root node. For each intermediated node the database will
+        be hit once.
 
         If no queryset was passed for ModelTree initiation, then items of all
         nodes will be `None`.

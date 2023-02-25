@@ -43,7 +43,7 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # autodoc-configuration
-autoclass_content = 'both'
+autoclass_content = 'class'
 autodoc_member_order = 'bysource'
 
 # intersphinx-config
