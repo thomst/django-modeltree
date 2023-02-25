@@ -23,14 +23,14 @@ Description
 ===========
 A ModelTree describes a django model and all its recursive relations to other
 models. It is Node based, iterable, walkable, searchable and can be populated
-by model items. See the `docs <https://thomst.github.io/django-modeltree/>`.
+by model items. See the `docs <https://thomst.github.io/django-modeltree/>`_.
 
 
 Links
 =====
 
-* `Repository <https://github.com/thomst/django-modeltree>`
-* `Documentation <https://thomst.github.io/django-modeltree/>`
+* `Repository <https://github.com/thomst/django-modeltree>`_
+* `Documentation <https://thomst.github.io/django-modeltree/>`_
 
 
 Installation
