@@ -9,7 +9,7 @@ from anytree.search import CountError
 from modeltree import __version__
 from modeltree import ModelTree
 from testapp.models import ModelA, ModelB, ModelC, ModelD, ModelE
-from testapp.models import ModelOne, ModelTwo, ModelThree
+from testapp.models import ModelOne, ModelTwo, ModelThree, ModelFour
 from testapp.management.commands.createtestdata import create_test_data
 
 
@@ -193,6 +193,7 @@ class ModelTreeTestCase(TestCase):
             ModelOne=ModelOne,
             ModelTwo=ModelTwo,
             ModelThree=ModelThree,
+            ModelFour=ModelFour,
             ModelTree=ModelTree,
             tree=ModelTree(ModelOne),
             )

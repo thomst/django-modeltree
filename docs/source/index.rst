@@ -6,8 +6,15 @@
 Current version: |version|
 
 
-Welcome to django-modeltree's documentation!
-============================================
+Welcome to the documentation of django-modeltree
+================================================
+
+.. automodule:: modeltree.modeltree
+
+|
+
+Api reference
+=============
 
 .. autoclass:: modeltree.ModelTree
    :members:

@@ -1,3 +1,117 @@
+"""
+What is a ModelTree?
+--------------------
+
+A ModelTree describes a :class:`~django.db.models.Model` and all its
+recursive relations to other models. It is :class:`~anytree.node.node.Node`
+based, iterable, walkable, searchable and can be populated by
+:attr:`~.ModelTree.items`.
+
+Guess you have these models::
+
+    class ModelOne(models.Model):
+        model_two = models.ManyToManyField(
+            'ModelTwo',
+            related_name='model_one',
+            blank=True)
+
+    class ModelTwo(models.Model):
+        model_three = models.ForeignKey(
+            'ModelThree',
+            related_name='model_two',
+            blank=True, null=True,
+            on_delete=models.SET_NULL)
+
+    class ModelThree(models.Model):
+        pass
+
+    class ModelFour(models.Model):
+        model_three = models.OneToOneField(
+            'ModelThree',
+            related_name='model_four',
+            blank=True, null=True,
+            on_delete=models.SET_NULL)
+
+    class ModelFive(models.Model):
+        model_two = models.ManyToManyField(
+            'ModelThree',
+            related_name='model_five',
+            blank=True)
+
+Then a tree representing these models will look like::
+
+    >>> tree = ModelTree(ModelOne)
+    >>> tree.show()
+    ModelOne
+    └── [many_to_many] ModelOne.model_two => ModelTwo
+        └── [many_to_one] ModelTwo.model_three => ModelThree
+            ├── [one_to_one] ModelThree.model_four => ModelFour
+            └── [many_to_many] ModelThree.model_five => ModelFive
+
+Or rendered by using the :attr:`~.ModelTree.field_path` attribute::
+
+    >>> tree = ModelTree(ModelOne)
+    >>> tree.show('field_path')
+    root
+    └── model_two
+        └── model_two__model_three
+            ├── model_two__model_three__model_four
+            └── model_two__model_three__model_five
+
+
+How to build a ModelTree?
+-------------------------
+
+This is very easy. Simply pass in the model the tree should be rooted to::
+
+    tree = ModelTree(ModelOne)
+
+Optionally you can pass in a queryset of your model. Every node then will be
+populated by items of the node's :attr:`~.ModelTree.model` that are related
+to these initial items by the direct or indirect relation of their models::
+
+    >>> items = ModelOne.objects.all()
+    >>> tree = ModelTree(ModelOne, items)
+
+Guess you want all ModelFive items that are related to the ModelOne items
+with which you initiated your tree::
+
+    >>> items = ModelOne.objects.all()
+    >>> tree = ModelTree(ModelOne, items)
+    >>> model_five_node = tree.get(model=ModelFive)
+    >>> len(model_five_node.items)
+    0
+
+See the :attr:`~.ModelTree.items` section for more information about how items
+are processed.
+
+
+What if I don't want to follow all model relations?
+---------------------------------------------------
+
+You can easily adjust the way your tree is build up. Therefore overwrite one
+or more of the following class attributes:
+
+* :attr:`~.ModelTree.MAX_DEPTH`
+* :attr:`~.ModelTree.RELATION_TYPES`
+* :attr:`~.ModelTree.FIELD_TYPES`
+* :attr:`~.ModelTree.FIELD_PATHS`
+
+Guess you whish to only follow specific relation-types::
+
+    >>> class MyModelTree(ModelTree):
+    ...     RELATION_TYPES = [
+    ...         'many_to_many',
+    ...         'many_to_one',
+    ...     ]
+    ...
+    >>> tree = MyModelTree(ModelOne)
+    >>> tree.show()
+    ModelOne
+    └── [many_to_many] ModelOne.model_two => ModelTwo
+        └── [many_to_one] ModelTwo.model_three => ModelThree
+            └── [many_to_many] ModelThree.model_five => ModelFive
+"""
 
 from anytree import AnyNode
 from anytree import RenderTree
@@ -10,44 +124,10 @@ from anytree import findall
 
 class ModelTree(AnyNode):
     """
-    **What is a ModelTree?**
-
-    A ModelTree describes a :class:`~django.db.models.Model` and all its
-    recursive relations to other models. It is :class:`~anytree.node.node.Node`
-    based, iterable, walkable, searchable and can be populated by :attr:`.items`.
-    
-    Guess you have these models::
-
-        class ModelOne(models.Model):
-            model_two = models.ManyToManyField(
-                'ModelTwo',
-                related_name='model_one',
-                blank=True)
-
-        class ModelTwo(models.Model):
-            model_three = models.ForeignKey(
-                'ModelThree',
-                related_name='model_two',
-                blank=True, null=True,
-                on_delete=models.SET_NULL)
-
-        class ModelThree(models.Model):
-            pass
-
-        class ModelFour(models.Model):
-            model_three = models.OneToOneField(
-                'ModelThree',
-                related_name='model_four',
-                blank=True, null=True,
-                on_delete=models.SET_NULL)
-
-        class ModelFive(models.Model):
-            model_two = models.ManyToManyField(
-                'ModelThree',
-                related_name='model_five',
-                blank=True)
-
-    Then a tree representing these models will look like::
+    A ModelTree is technical a Subclass of :class:`~anytree.node.node.AnyNode`,
+    that builds its own children nodes based on the recursives model relations.
+    Means you just have to pass in a model and get a complete tree of this model
+    and all its relations::
 
         >>> tree = ModelTree(ModelOne)
         >>> tree.show()
@@ -57,58 +137,27 @@ class ModelTree(AnyNode):
                 ├── [one_to_one] ModelThree.model_four => ModelFour
                 └── [many_to_many] ModelThree.model_five => ModelFive
 
-    Or rendered by using the :attr:`.field_path` attribute::
+    In advance you can pass in some items of your model as a queryset. The
+    :attr:`.items` property of each node of your tree then reflects the itmes
+    that are derived from the initial items by the direct or indirect relations
+    of their models.
 
-        >>> tree = ModelTree(ModelOne)
-        >>> tree.show('field_path')
-        root
-        └── model_two
-            └── model_two__model_three
-                ├── model_two__model_three__model_four
-                └── model_two__model_three__model_five
+        >>> items = ModelOne.objects.all()
+        >>> tree = ModelTree(ModelOne, items)
 
+    Guess you want all ModelFour items that are related to the ModelOne items
+    with which you initiated your tree::
 
-    **How to build a ModelTree?**
+        >>> items = ModelOne.objects.all()
+        >>> tree = ModelTree(ModelOne, items)
+        >>> model_four_node = tree.get(model=ModelFour)
+        >>> len(model_four_node.items)
+        0
 
-    This is very easy. Simply pass in the model the tree should be rooted to::
-
-        tree = ModelTree(ModelOne)
-
-    Optionally you can pass in a queryset of your model. Every node then
-    will be populated by items of the node's :attr:`.model` that are related
-    to these initial items::
-
-        items = ModelOne.objects.all()
-        tree = ModelTree(ModelOne, items)
-
-    See the :attr:`.items` section for more information about how items are
-    processed.
-
-
-    **What if I don't want to follow all model relations?**
-
-    You can easily adjust the way your tree is build up. Therefore overwrite one
-    or more of the following class attributes:
-
-    * :attr:`.MAX_DEPTH`
-    * :attr:`.RELATION_TYPES`
-    * :attr:`.FIELD_TYPES`
-    * :attr:`.FIELD_PATHS`
-
-    Guess you whish to only follow specific relation-types::
-
-        >>> class MyModelTree(ModelTree):
-        ...     RELATION_TYPES = [
-        ...         'many_to_many',
-        ...         'many_to_one',
-        ...     ]
-        ...
-        >>> tree = MyModelTree(ModelOne)
-        >>> tree.show()
-        ModelOne
-        └── [many_to_many] ModelOne.model_two => ModelTwo
-            └── [many_to_one] ModelTwo.model_three => ModelThree
-                └── [many_to_many] ModelThree.model_five => ModelFive
+    :param model: model to start with
+    :type model: :class:`~django.db.models.Model`
+    :param items: model items (optional)
+    :type items: :class:`~django.db.models.query.QuerySet`
     """
 
     MAX_DEPTH = 3
