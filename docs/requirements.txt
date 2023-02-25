@@ -1,0 +1,5 @@
+Sphinx
+sphinxcontrib-napoleon
+sphinx-rtd-theme
+Django
+anytree
