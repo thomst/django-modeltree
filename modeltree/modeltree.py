@@ -484,7 +484,20 @@ class ModelTree(AnyNode):
 
     def iterate(self, by_level=False, by_grouped_level=False, maxlevel=None, has_items=False, filter=None):
         """
-        Return a tree iterator.
+        Return a tree iterator using the iteration classes of anytree:
+
+        * :class:`~anytree.iterators.preorderiter.PreOrderIter`
+        * :class:`~anytree.iterators.levelorderiter.LevelOrderIter`
+        * :class:`~anytree.iterators.levelordergroupiter.LevelOrderGroupIter`
+
+        By default an instance of the ProOrderIter class will be returned.
+
+        :param bool by_level: use the LevelOrderIter class
+        :param bool by_grouped_level: use the LevelOrderGroupIter class
+        :param int maxlevel: maximum iteration level
+        :param bool has_items: iterate only over nodes with more than 0 items
+        :param callable filter: a callable recieving the node and returning a boolean.
+        :return: iterator
         """
         filters = list(filter) if filter else list()
         if has_items:
