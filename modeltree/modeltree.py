@@ -223,10 +223,6 @@ class ModelTree(AnyNode):
         classname = type(self).__name__
         return '{}(model={}, field={})'.format(classname, self.model, self.field)
 
-    def __str__(self):
-        classname = type(self).__name__
-        return '{} <{}>'.format(classname, self.name)
-
     @property
     def name(self):
         """
