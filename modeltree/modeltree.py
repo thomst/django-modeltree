@@ -163,7 +163,7 @@ class ModelTree(AnyNode):
 
     MAX_DEPTH = 3
     """
-    Max depth of the tree structure
+    Max depth of the tree structure.
     """
 
     RELATION_TYPES = None
