@@ -111,6 +111,7 @@ Guess you whish to only follow specific relation-types::
     └── [many_to_many] ModelOne.model_two => ModelTwo
         └── [many_to_one] ModelTwo.model_three => ModelThree
             └── [many_to_many] ModelThree.model_five => ModelFive
+
 """
 
 from anytree import AnyNode
@@ -239,6 +240,7 @@ class ModelTree(AnyNode):
 
             >>> tree.root.name
             'root'
+
         """
         return self.field_path
 
@@ -307,6 +309,7 @@ class ModelTree(AnyNode):
 
             >>> tree.root.label
             'ModelOne'
+
         """
         if self.field:
             return '{} -> {}'.format(self.field.name, self.model_name)
@@ -328,6 +331,7 @@ class ModelTree(AnyNode):
 
             >>> tree.root.verbose_label
             'ModelOne'
+
         """
         if self.field:
             relation_types = ['one_to_one', 'one_to_many', 'many_to_one', 'many_to_many']
@@ -345,6 +349,7 @@ class ModelTree(AnyNode):
             >>> node_three = list(tree.iterate())[2]
             >>> node_three.label_path
             'ModelOne.model_two -> ModelTwo.model_three -> ModelThree'
+
         """
         return '.'.join(n.label for n in self.path)
 
@@ -357,6 +362,7 @@ class ModelTree(AnyNode):
             >>> node_three = list(tree.iterate())[2]
             >>> node_three.model_path
             'ModelOne -> ModelTwo -> ModelThree'
+
         """
         return ' -> '.join(n.model_name for n in self.path)
 
@@ -375,6 +381,7 @@ class ModelTree(AnyNode):
 
             >>> tree.root.field_path
             'root'
+
         """
         if self.is_root:
             return 'root'
