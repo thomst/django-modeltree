@@ -506,7 +506,7 @@ class ModelTree(AnyNode):
         :param callable filter: a callable recieving the node and returning a boolean.
         :return: iterator
         """
-        filters = list(filter) if filter else list()
+        filters = [filter] if filter else list()
         if has_items:
             filters.append(lambda n: bool(n.items))
 
