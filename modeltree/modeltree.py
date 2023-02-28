@@ -114,6 +114,7 @@ Guess you whish to only follow specific relation-types::
 
 """
 
+from django.db import models
 from anytree import AnyNode
 from anytree import RenderTree
 from anytree import LevelOrderIter
@@ -121,6 +122,22 @@ from anytree import LevelOrderGroupIter
 from anytree import PreOrderIter
 from anytree import find
 from anytree import findall
+
+
+RELATION_TYPES = [
+    'one_to_one',
+    'one_to_many',
+    'many_to_one',
+    'many_to_many',
+]
+FIELD_TYPES = [
+    models.OneToOneField,
+    models.OneToOneRel,
+    models.ForeignKey,
+    models.ManyToOneRel,
+    models.ManyToManyField,
+    models.ManyToManyRel,
+]
 
 
 class ModelTree(AnyNode):
@@ -166,10 +183,10 @@ class ModelTree(AnyNode):
     Max depth of the tree structure.
     """
 
-    RELATION_TYPES = None
+    RELATION_TYPES = RELATION_TYPES
     """
-    A list of relations types as strings to follow when building the tree.
-    By default all relations types will be followed. Types might be::
+    A list of relation-types as strings to follow when building the tree.
+    By default all relation-types will be followed::
 
         RELATION_TYPES = [
             'one_to_one',
@@ -179,10 +196,10 @@ class ModelTree(AnyNode):
         ]
     """
 
-    FIELD_TYPES = None
+    FIELD_TYPES = FIELD_TYPES
     """
-    A list of field types to follow when building the tree.
-    By default all field types will be followed. Types might be::
+    A list of field-types to follow when building the tree.
+    By default these field-types will be followed::
 
         FIELD_TYPES = [
             models.OneToOneField,
@@ -192,6 +209,11 @@ class ModelTree(AnyNode):
             models.ManyToManyField,
             models.ManyToManyRel,
         ]
+
+    .. note::
+    
+        Generic relations using the contenttypes framework are not supported
+        yet.
     """
 
     FIELD_PATHS = None
@@ -290,8 +312,7 @@ class ModelTree(AnyNode):
         This is an empty string for the root node.
         """
         if self.field:
-            relation_types = ['one_to_one', 'one_to_many', 'many_to_one', 'many_to_many']
-            return [t for t in relation_types if getattr(self.field, t)][0]
+            return [t for t in RELATION_TYPES if getattr(self.field, t)][0]
         else:
             return str()
 
@@ -539,9 +560,9 @@ class ModelTree(AnyNode):
             return False
         elif field.remote_field is self.field:
             return False
-        elif self.RELATION_TYPES and not any(getattr(field, t) for t in self.RELATION_TYPES):
+        elif not any(getattr(field, t) for t in self.RELATION_TYPES):
             return False
-        elif self.FIELD_TYPES and not any(isinstance(field, t) for t in self.FIELD_TYPES):
+        elif not type(field) in self.FIELD_TYPES:
             return False
         elif self.FIELD_PATHS and not self._follow_this_path(field):
             return False
