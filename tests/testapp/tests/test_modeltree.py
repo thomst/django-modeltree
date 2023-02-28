@@ -1,5 +1,5 @@
+import doctest
 from io import StringIO
-from doctest import run_docstring_examples, testmod
 from contextlib import redirect_stdout
 from django.test import TestCase
 from django.db import models
@@ -9,7 +9,7 @@ from anytree.search import CountError
 from modeltree import __version__
 from modeltree import ModelTree
 from testapp.models import ModelA, ModelB, ModelC, ModelD, ModelE
-from testapp.models import ModelOne, ModelTwo, ModelThree, ModelFour
+from testapp.models import ModelOne, ModelTwo, ModelThree, ModelFour, ModelFive
 from testapp.management.commands.createtestdata import create_test_data
 
 
@@ -195,18 +195,9 @@ class ModelTreeTestCase(TestCase):
             ModelTwo=ModelTwo,
             ModelThree=ModelThree,
             ModelFour=ModelFour,
+            ModelFive=ModelFive,
             ModelTree=ModelTree,
             tree=ModelTree(ModelOne),
             )
-        run_docstring_examples(ModelTree, globs=globs)
-        run_docstring_examples(ModelTree.__init__, globs=globs)
-        run_docstring_examples(ModelTree.label, globs=globs)
-        run_docstring_examples(ModelTree.verbose_label, globs=globs)
-        run_docstring_examples(ModelTree.label_path, globs=globs)
-        run_docstring_examples(ModelTree.model_path, globs=globs)
-        run_docstring_examples(ModelTree.field_path, globs=globs)
-        run_docstring_examples(ModelTree.items, globs=globs)
-        run_docstring_examples(ModelTree.render, globs=globs)
-        run_docstring_examples(ModelTree.find, globs=globs)
-        run_docstring_examples(ModelTree.grep, globs=globs)
-        run_docstring_examples(ModelTree.iterate, globs=globs)
+        modeltree_file = '../../../modeltree/modeltree.py'
+        doctest.testfile(modeltree_file, globs=globs, raise_on_error=True)
