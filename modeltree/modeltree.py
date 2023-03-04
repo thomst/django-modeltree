@@ -555,16 +555,26 @@ class ModelTree(AnyNode):
         return this_path in allowed_paths
 
     def _follow_this_field(self, field):
+        # Only follow relational fields.
         if not field.is_relation:
             return False
+
+        # Do not follow a field back to its remote field.
         elif field.remote_field is self.field:
             return False
+
+        # Only follow specific relation-types.
         elif not any(getattr(field, t) for t in self.RELATION_TYPES):
             return False
+
+        # Only follow specific field-types.
         elif not type(field) in self.FIELD_TYPES:
             return False
+
+        # Only follow specific field-paths.
         elif self.FIELD_PATHS and not self._follow_this_path(field):
             return False
+
         else:
             return True
 
