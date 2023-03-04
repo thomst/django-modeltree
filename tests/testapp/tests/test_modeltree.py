@@ -194,4 +194,8 @@ class ModelTreeTestCase(TestCase):
             tree=ModelTree(ModelOne),
             )
         modeltree_file = '../../../modeltree/modeltree.py'
-        doctest.testfile(modeltree_file, globs=globs, raise_on_error=True)
+        try:
+            doctest.testfile(modeltree_file, globs=globs, raise_on_error=True)
+        except (doctest.UnexpectedException, doctest.DocTestFailure) as exc:
+            print(exc.example.lineno, exc.example.source)
+            raise exc
