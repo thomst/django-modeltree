@@ -113,7 +113,7 @@ Guess you whish to only follow specific relation-types::
         └── model_three -> ModelThree
             └── model_five -> ModelFive
 
-For further adjustments you could also overwrite :meth:`~.ModelTree.follow`.
+For further adjustments you could also overwrite :meth:`~.ModelTree._follow`.
 """
 
 from django.db import models
@@ -435,7 +435,7 @@ class ModelTree(AnyNode):
 
         return iter_class(self, maxlevel=maxlevel, filter_=filter)
 
-    def follow(self, field):
+    def _follow(self, field):
         """
         To fine-tune the way a tree is build overwrite this method. You can do
         what ever you want evaluating a field. Guess you only want to build your
@@ -443,7 +443,7 @@ class ModelTree(AnyNode):
 
             >>> class MyModelTree(ModelTree):
             ...    FOLLOW_ACROSS_APPS = True
-            ...    def follow(self, field):
+            ...    def _follow(self, field):
             ...       if field.related_model._meta.app_label in ['testapp']:
             ...          return True
             ...       else:
@@ -503,7 +503,7 @@ class ModelTree(AnyNode):
             return False
 
         # Allow customizing the tree building by follow method.
-        elif not self.follow(field):
+        elif not self._follow(field):
             return False
 
         else:

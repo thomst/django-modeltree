@@ -19,6 +19,9 @@ Api reference
 .. autoclass:: modeltree.ModelTree
    :members:
 
+.. automethod:: modeltree.ModelTree._follow
+
+|
 
 Indices and tables
 ==================

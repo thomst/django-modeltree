@@ -42,7 +42,7 @@ class TreeWithMaxDepth(ModelTree):
 
 class TreeWithFollowMethod(ModelTree):
     FOLLOW_ACROSS_APPS = True
-    def follow(self, field):
+    def _follow(self, field):
         if field.related_model in [Group, Permission]:
             return False
         else:
