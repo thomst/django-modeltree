@@ -503,24 +503,6 @@ class ModelTree(AnyNode):
         filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
         return findall(self, filter)
 
-    def grep(self, pattern, key='name'):
-        """
-        Grep nodes by a pattern that matches a specific attribute. The
-        attribute's value must be of type string. By default the :attr:`.name`
-        attribute of a node is used::
-
-            >>> tree = ModelTree(ModelOne)
-            >>> len(tree.grep('model_two'))
-            4
-            >>> len(tree.grep('many_to', key='relation_type'))
-            3
-
-        :param str pattern: a pattern matching a string attribute of the node
-        :param str key: name of the attribute to be tried
-        :return: tuple of nodes
-        """
-        return findall(self, lambda n: pattern in getattr(n, key))
-
     def iterate(self, by_level=False, by_grouped_level=False, maxlevel=None, has_items=False, filter=None):
         """
         Return a tree iterator using the iteration classes of anytree:

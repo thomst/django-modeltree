@@ -171,11 +171,6 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(root.find(field_type=models.ManyToManyField)), 5)
         self.assertEqual(len(root.find(model=ModelC)), 7)
 
-        # grep
-        self.assertEqual(len(root.grep('model_c__modelb')), 5)
-        self.assertEqual(len(root.grep('ModelB', key='label')), 11)
-        for node in root.grep('ModelB', key='label'):
-            self.assertTrue('ModelB' in node.label)
 
         # render and show
         self.assertIsInstance(root.render(), RenderTree)
