@@ -43,16 +43,16 @@ Then a tree representing these models will look like::
     >>> tree = ModelTree(ModelOne)
     >>> tree.show()
     ModelOne
-    └── [many_to_many] ModelOne.model_two => ModelTwo
-        └── [many_to_one] ModelTwo.model_three => ModelThree
-            ├── [one_to_one] ModelThree.model_four => ModelFour
-            └── [many_to_many] ModelThree.model_five => ModelFive
+    └── model_two -> ModelTwo
+        └── model_three -> ModelThree
+            ├── model_four -> ModelFour
+            └── model_five -> ModelFive
 
 Or rendered by using the :attr:`~.ModelTree.field_path` attribute::
 
     >>> tree = ModelTree(ModelOne)
-    >>> tree.show('field_path')
-    root
+    >>> tree.show('{node.field_path}')
+    ModelOne
     └── model_two
         └── model_two__model_three
             ├── model_two__model_three__model_four
@@ -78,7 +78,7 @@ with which you initiated your tree::
 
     >>> items = ModelOne.objects.all()
     >>> tree = ModelTree(ModelOne, items)
-    >>> model_five_node = tree.get(model=ModelFive)
+    >>> model_five_node = tree.get(filter=lambda n: n.model == ModelFive)
     >>> len(model_five_node.items)
     0
 
@@ -90,9 +90,10 @@ What if I don't want to follow all model relations?
 ---------------------------------------------------
 
 You can easily adjust the way your tree is build up. Therefore overwrite one
-or more of the following class attributes:
+or more of the following class attributes in your ModelTree subclass:
 
 * :attr:`~.ModelTree.MAX_DEPTH`
+* :attr:`~.ModelTree.FOLLOW_ACROSS_APPS`
 * :attr:`~.ModelTree.RELATION_TYPES`
 * :attr:`~.ModelTree.FIELD_TYPES`
 * :attr:`~.ModelTree.FIELD_PATHS`
@@ -108,9 +109,9 @@ Guess you whish to only follow specific relation-types::
     >>> tree = MyModelTree(ModelOne)
     >>> tree.show()
     ModelOne
-    └── [many_to_many] ModelOne.model_two => ModelTwo
-        └── [many_to_one] ModelTwo.model_three => ModelThree
-            └── [many_to_many] ModelThree.model_five => ModelFive
+    └── model_two -> ModelTwo
+        └── model_three -> ModelThree
+            └── model_five -> ModelFive
 
 """
 
@@ -151,10 +152,10 @@ class ModelTree(AnyNode):
         >>> tree = ModelTree(ModelOne)
         >>> tree.show()
         ModelOne
-        └── [many_to_many] ModelOne.model_two => ModelTwo
-            └── [many_to_one] ModelTwo.model_three => ModelThree
-                ├── [one_to_one] ModelThree.model_four => ModelFour
-                └── [many_to_many] ModelThree.model_five => ModelFive
+        └── model_two -> ModelTwo
+            └── model_three -> ModelThree
+                ├── model_four -> ModelFour
+                └── model_five -> ModelFive
 
     In advance you can pass in some items of your model as a queryset. The
     :attr:`.items` property of each node of your tree then reflects the itmes
@@ -169,7 +170,7 @@ class ModelTree(AnyNode):
 
         >>> items = ModelOne.objects.all()
         >>> tree = ModelTree(ModelOne, items)
-        >>> model_four_node = tree.get(model=ModelFour)
+        >>> model_four_node = tree.get(filter=lambda n: n.model == ModelFour)
         >>> len(model_four_node.items)
         0
 
