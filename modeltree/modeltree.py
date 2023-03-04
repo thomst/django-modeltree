@@ -298,7 +298,7 @@ class ModelTree(AnyNode):
     def field_path(self):
         """
         String describing the node's :attr:`~anytree.node.nodemixin.NodeMixin.path`
-        using the :attr:`.field_name` of nodes::
+        using the name of the node's :attr:`.field`::
 
             >>> node_four = list(tree.iterate())[3]
             >>> node_four.field_path
