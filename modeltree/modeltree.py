@@ -117,7 +117,6 @@ For further adjustments you could also overwrite :meth:`~.ModelTree.follow`.
 """
 
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
 from anytree import AnyNode
 from anytree import RenderTree
 from anytree import LevelOrderIter
@@ -481,7 +480,8 @@ class ModelTree(AnyNode):
             return False
 
         # Do not follow generic relations.
-        elif not field.related_model or field.related_model is ContentType:
+        elif (not field.related_model or
+              field.related_model._meta.app_label == 'contenttypes'):
             return False
 
         # Do not follow across apps if not setup so.
