@@ -247,9 +247,15 @@ class ModelTree(AnyNode):
         self._items = items
         self._build_tree()
 
+    def __str__(self):
+        if self._field:
+            return '{} -> {}'.format(self._field.name, self._model._meta.object_name)
+        else:
+            return '{}'.format(self._model._meta.object_name)
+
     def __repr__(self):
         classname = type(self).__name__
-        return '{}(model={}, field={})'.format(classname, self.model, self.field)
+        return '{}(model={}, field={})'.format(classname, repr(self._model), repr(self._field))
 
     @property
     def name(self):
