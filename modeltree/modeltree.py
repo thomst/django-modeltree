@@ -199,7 +199,7 @@ class ModelTree(AnyNode):
     FIELD_TYPES = FIELD_TYPES
     """
     A list of field-types to follow when building the tree.
-    By default these field-types will be followed::
+    By default all field-types and their reverse field-types are followed::
 
         FIELD_TYPES = [
             models.OneToOneField,
@@ -212,8 +212,7 @@ class ModelTree(AnyNode):
 
     .. note::
     
-        Generic relations using the contenttypes framework are not supported
-        yet.
+        Generic relations using the contenttypes framework are not supported.
     """
 
     FIELD_PATHS = None
