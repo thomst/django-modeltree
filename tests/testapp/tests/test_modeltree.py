@@ -71,7 +71,6 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelD)), 1)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelE)), 0)
 
-
     def test_04_tree_with_field_types(self):
         root = TreeWithFieldTypes(ModelA)
         self.assertEqual(len(list(root.iterate(by_level=True))), 9)
@@ -81,7 +80,6 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelD)), 2)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelE)), 2)
 
-
     def test_05_tree_with_relation_types(self):
         root = TreeWithRelationTypes(ModelA)
         self.assertEqual(len(list(root.iterate(by_level=True))), 4)
@@ -90,7 +88,6 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelC)), 1)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelD)), 0)
         self.assertEqual(len(findall(root, filter_=lambda n: n.model == ModelE)), 1)
-
 
     def test_06_tree_with_max_depth(self):
         root = TreeWithMaxDepth(ModelA)
