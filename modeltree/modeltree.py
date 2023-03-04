@@ -258,38 +258,11 @@ class ModelTree(AnyNode):
         return '{}(model={}, field={})'.format(classname, repr(self._model), repr(self._field))
 
     @property
-    def name(self):
-        """
-        A unique name as a identifier of the node. Since the :attr:`.field_path`
-        is the most compact and unique value describing a node it serves best
-        as the node's name attribute::
-
-            >>> node = tree.get('model_two__model_three')
-            >>> node.name == node.field_path
-            True
-
-        The name of the root node which has no field by its own is simply the
-        string 'root'::
-
-            >>> tree.root.name
-            'root'
-
-        """
-        return self.field_path
-
-    @property
     def model(self):
         """
         :class:`django.db.models.Model` of the node.
         """
         return self._model
-
-    @property
-    def model_name(self):
-        """
-        Class name of the node's :attr:`.model`.
-        """
-        return self.model._meta.object_name
 
     @property
     def field(self):
@@ -298,22 +271,6 @@ class ModelTree(AnyNode):
         This is None for the root node.
         """
         return self._field
-
-    @property
-    def field_name(self):
-        """
-        Name attribute of the node's :attr:`.field`.
-        This is an empty string for the root node.
-        """
-        return self.field.name if self.field else str()
-
-    @property
-    def field_type(self):
-        """
-        Type of the :attr:`.field`.
-        This is None for the root node.
-        """
-        return type(self.field) if self.field else None
 
     @property
     def relation_type(self):
@@ -326,77 +283,6 @@ class ModelTree(AnyNode):
             return [t for t in RELATION_TYPES if getattr(self.field, t)][0]
         else:
             return str()
-
-    @property
-    def label(self):
-        """
-        String describing the field-model relation::
-
-            >>> node_two = tree.get('model_two')
-            >>> node_two.label
-            'model_two -> ModelTwo'
-
-        Since the root node has no field assigned it only shows the class name
-        of its model::
-
-            >>> tree.root.label
-            'ModelOne'
-
-        """
-        if self.field:
-            return '{} -> {}'.format(self.field.name, self.model_name)
-        else:
-            return str(self.model_name)
-
-    @property
-    def verbose_label(self):
-        """
-        String describing the field-model relation including the relation-type
-        and the parent-model::
-
-            >>> node_two = tree.get('model_two')
-            >>> node_two.verbose_label
-            '[many_to_many] ModelOne.model_two => ModelTwo'
-
-        Since the root node has no field assigned it only shows the class name
-        of its model::
-
-            >>> tree.root.verbose_label
-            'ModelOne'
-
-        """
-        if self.field:
-            relation_types = ['one_to_one', 'one_to_many', 'many_to_one', 'many_to_many']
-            relation_type = [t for t in relation_types if getattr(self.field, t)][0]
-            return '[{}] {}.{} => {}'.format(relation_type, self.parent.model_name, self.field.name, self.model_name)
-        else:
-            return str(self.model_name)
-
-    @property
-    def label_path(self):
-        """
-        String describing the node's :attr:`~anytree.node.nodemixin.NodeMixin.path`
-        using the :attr:`.label` of nodes::
-
-            >>> node_three = list(tree.iterate())[2]
-            >>> node_three.label_path
-            'ModelOne.model_two -> ModelTwo.model_three -> ModelThree'
-
-        """
-        return '.'.join(n.label for n in self.path)
-
-    @property
-    def model_path(self):
-        """
-        String describing the node's :attr:`~anytree.node.nodemixin.NodeMixin.path`
-        using the :attr:`.model_name` of nodes::
-
-            >>> node_three = list(tree.iterate())[2]
-            >>> node_three.model_path
-            'ModelOne -> ModelTwo -> ModelThree'
-
-        """
-        return ' -> '.join(n.model_name for n in self.path)
 
     @property
     def field_path(self):

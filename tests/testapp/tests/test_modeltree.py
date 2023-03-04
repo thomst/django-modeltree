@@ -47,13 +47,11 @@ class ModelTreeTestCase(TestCase):
     def test_01_node(self):
         root = ModelTree(ModelA)
         node = root.get('model_c__modelb__model_b')
-        self.assertEqual(node.label, 'model_b -> ModelB')
-        self.assertEqual(node.verbose_label, '[one_to_one] ModelB.model_b => ModelB')
         self.assertEqual(node.field_path, 'model_c__modelb__model_b')
-        self.assertEqual(node.model_path, 'ModelA -> ModelC -> ModelB -> ModelB')
-        self.assertEqual(node.label_path, 'ModelA.model_c -> ModelC.modelb -> ModelB.model_b -> ModelB')
-        self.assertEqual(len(node.path), 4)
+        self.assertEqual(node.model, ModelB)
+        self.assertEqual(node.field.name, 'model_b')
         self.assertEqual(node.items, None)
+        self.assertEqual(len(node.path), 4)
 
     def test_02_tree(self):
         root = ModelTree(ModelA)
@@ -171,14 +169,12 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(len(root.find(lambda n: type(n.field) == models.ManyToManyField)), 5)
         self.assertEqual(len(root.find(lambda n: n.model == ModelC)), 7)
 
-
         # render and show
         self.assertIsInstance(root.render(), RenderTree)
         self.assertIn(nodes[4].field_path, root.render().by_attr('field_path'))
-        self.assertIn(nodes[4].model_path, root.render().by_attr('model_path'))
-        self.assertIn(nodes[4].field_name, root.render().by_attr('field_name'))
         self.assertIn(nodes[4].relation_type, root.render().by_attr('relation_type'))
-        self.assertIn(nodes[4].label, root.render().by_attr('label'))
+        self.assertIn(str(nodes[4].model), root.render().by_attr('model'))
+        self.assertIn(str(nodes[4].field), root.render().by_attr('field'))
         with redirect_stdout(StringIO()) as stdout:
             root.show()
         self.assertIn(str(nodes[4]), stdout.getvalue())
