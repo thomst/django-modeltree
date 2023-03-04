@@ -3,6 +3,7 @@ from io import StringIO
 from contextlib import redirect_stdout
 from django.test import TestCase
 from django.db import models
+from django.contrib.auth.models import Group, Permission
 from anytree import findall
 from anytree import RenderTree
 from anytree.search import CountError
@@ -37,6 +38,15 @@ class TreeWithFieldPaths(ModelTree):
 
 class TreeWithMaxDepth(ModelTree):
     MAX_DEPTH = 1
+
+
+class TreeWithFollowMethod(ModelTree):
+    FOLLOW_ACROSS_APPS = True
+    def follow(self, field):
+        if field.related_model in [Group, Permission]:
+            return False
+        else:
+            return True
 
 
 class ModelTreeTestCase(TestCase):
@@ -199,3 +209,8 @@ class ModelTreeTestCase(TestCase):
         except (doctest.UnexpectedException, doctest.DocTestFailure) as exc:
             print(exc.example.lineno, exc.example.source)
             raise exc
+
+    def test_11_tree_with_follow_method(self):
+        root = TreeWithFollowMethod(ModelA)
+        self.assertTrue(any(n.model._meta.app_label == 'auth' for n in root.iterate()))
+        self.assertTrue(all(n.model not in [Group, Permission] for n in root.iterate()))

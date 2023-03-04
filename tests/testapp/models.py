@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 class BaseModel(models.Model):
@@ -17,6 +20,7 @@ class ModelA(BaseModel):
     model_b = models.OneToOneField('ModelB', blank=True, null=True, on_delete=models.SET_NULL)
     model_c = models.ForeignKey('ModelC', blank=True, null=True, on_delete=models.SET_NULL)
     model_d = models.ManyToManyField('ModelD', blank=True)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
 
 class ModelB(BaseModel):
@@ -32,6 +36,9 @@ class ModelC(BaseModel):
 
 class ModelD(BaseModel):
     id = models.SmallIntegerField(primary_key=True)
+    content_type = models.ForeignKey(ContentType, blank=True, null=True, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
 
 class ModelE(BaseModel):
@@ -57,7 +64,9 @@ class ModelTwo(models.Model):
         on_delete=models.SET_NULL)
 
 class ModelThree(models.Model):
-    pass
+    content_type = models.ForeignKey(ContentType, blank=True, null=True, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
 
 class ModelFour(models.Model):

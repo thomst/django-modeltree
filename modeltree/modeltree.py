@@ -113,6 +113,7 @@ Guess you whish to only follow specific relation-types::
         └── model_three -> ModelThree
             └── model_five -> ModelFive
 
+For further adjustments you could also overwrite :meth:`~.ModelTree.follow`.
 """
 
 from django.db import models
@@ -435,6 +436,29 @@ class ModelTree(AnyNode):
 
         return iter_class(self, maxlevel=maxlevel, filter_=filter)
 
+    def follow(self, field):
+        """
+        To fine-tune the way a tree is build overwrite this method. You can do
+        what ever you want evaluating a field. Guess you only want to build your
+        tree for specific django-apps::
+
+            >>> class MyModelTree(ModelTree):
+            ...    def follow(self, field):
+            ...       if field.related_model._meta.app_label in ['testapp']:
+            ...          return True
+            ...       else:
+            ...          return False
+            ... 
+            >>> tree = MyModelTree(ModelOne)
+            >>> all(n.model._meta.app_label == 'testapp' for n in tree.iterate())
+            True
+
+        :param field: the field of :attr:`.model` to follow building the tree
+        :type field: a model's relation field
+        :return boolean: True to follow, False to not follow
+        """
+        return True
+
     def _follow_this_path(self, field):
         allowed_paths = set()
         for path in self.FIELD_PATHS:
@@ -475,6 +499,10 @@ class ModelTree(AnyNode):
 
         # Only follow specific field-paths.
         elif self.FIELD_PATHS and not self._follow_this_path(field):
+            return False
+
+        # Allow customizing the tree building by follow method.
+        elif not self.follow(field):
             return False
 
         else:
