@@ -442,6 +442,7 @@ class ModelTree(AnyNode):
         tree for specific django-apps::
 
             >>> class MyModelTree(ModelTree):
+            ...    FOLLOW_ACROSS_APPS = True
             ...    def follow(self, field):
             ...       if field.related_model._meta.app_label in ['testapp']:
             ...          return True
