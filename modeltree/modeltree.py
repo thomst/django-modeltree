@@ -115,6 +115,7 @@ Guess you whish to only follow specific relation-types::
 """
 
 from django.db import models
+from django.contrib.contenttypes.models import ContentType
 from anytree import AnyNode
 from anytree import RenderTree
 from anytree import LevelOrderIter
@@ -561,6 +562,10 @@ class ModelTree(AnyNode):
 
         # Do not follow a field back to its remote field.
         elif field.remote_field is self.field:
+            return False
+
+        # Do not follow generic relations.
+        elif not field.related_model or field.related_model is ContentType:
             return False
 
         # Only follow specific relation-types.
