@@ -184,6 +184,11 @@ class ModelTree(AnyNode):
     Max depth of the tree structure.
     """
 
+    FOLLOW_ACROSS_APPS = False
+    """
+    Follow relations across different apps.
+    """
+
     RELATION_TYPES = RELATION_TYPES
     """
     A list of relation-types as strings to follow when building the tree.
@@ -566,6 +571,11 @@ class ModelTree(AnyNode):
 
         # Do not follow generic relations.
         elif not field.related_model or field.related_model is ContentType:
+            return False
+
+        # Do not follow across apps if not setup so.
+        elif (not self.FOLLOW_ACROSS_APPS and
+              not field.related_model._meta.app_label == self.model._meta.app_label):
             return False
 
         # Only follow specific relation-types.
