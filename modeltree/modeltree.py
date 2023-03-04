@@ -113,7 +113,8 @@ Guess you whish to only follow specific relation-types::
         └── model_three -> ModelThree
             └── model_five -> ModelFive
 
-For further adjustments you could also overwrite :meth:`~.ModelTree._follow`.
+For further adjustments you could also overwrite the private
+:meth:`~.ModelTree._follow` method. See the description below.
 """
 
 from django.db import models
