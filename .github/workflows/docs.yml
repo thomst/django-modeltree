@@ -30,7 +30,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build docs
-        uses: e2nIEE/sphinx-action@master
+        uses: thomst/sphinx-action@master
         with:
           docs-folder: "docs/"
       - name: Upload artifact
