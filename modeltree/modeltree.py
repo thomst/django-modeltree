@@ -459,48 +459,60 @@ class ModelTree(AnyNode):
         """
         return RenderTree(self)
 
-    def show(self, key='verbose_label'):
+    def show(self, format='{node}', root_format='{node}'):
         """
-        Print a rendered tree using a specific attribute. 
+        Print a tree. Each node will be rendered by using a format string which
+        reference the node object by the key `node'::
 
-        :param str key: attribute to be used to render the tree (optional)
-        """
-        print(self.render().by_attr(key))
+        >>> tree = ModelTree(ModelOne)
+        >>> tree.show('{node.field.model._meta.object_name}.{node.field.name} -> {node.model._meta.object_name}')
+        ModelOne
+        └── ModelOne.model_two -> ModelTwo
+            └── ModelTwo.model_three -> ModelThree
+                ├── ModelThree.model_four -> ModelFour
+                └── ModelThree.model_five -> ModelFive
 
-    def get(self, name=None, **params):
+        :param str format: format string to render a node object (optional)
+        :param str root_format: format string to render the root node object (optional)
         """
-        Either lookup a node by its :attr:`.name` or pass in any number of
-        parameter to identify a specific node::
+        for prefix, _, node in self.render():
+            if root_format and node.is_root:
+                label = root_format.format(node=node)
+            else:
+                label = format.format(node=node)
+            print(f'{prefix}{label}')
+
+    def get(self, field_path=None, filter=None):
+        """
+        Either lookup a node by its :attr:`.field_path` or use a filter::
 
             >>> tree = ModelTree(ModelOne)
-            >>> tree.get('model_two') == tree.get(model=ModelTwo)
+            >>> tree.get('model_two') == tree.get(filter=lambda n: n.model == ModelTwo)
             True
 
-        :param str name: a node's :attr:`.name` (optional)
+        :param str field_path: a node's :attr:`.field_path` (optional)
         :params: any key value pair referencing to a node's attribute
         :return: node object or None if no node matches the search parameters
         :rtype: :class:`~modeltree.ModelTree` or None
         :raises: :class:`~anytree.search.CountError`: if more than one node was found
         """
-        if not name is None:
-            params['name'] = name
-        filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
+        if field_path:
+            filter = lambda n: n.field_path == field_path
         return find(self, filter)
 
-    def find(self, **params):
+    def find(self, filter):
         """
-        Find nodes by specific attributes::
+        Find nodes using a filter::
 
             >>> tree = ModelTree(ModelOne)
-            >>> len(tree.find(relation_type='many_to_many'))
+            >>> len(tree.find(lambda n: n.relation_type == 'many_to_many'))
             2
-            >>> len(tree.find(field_type=models.OneToOneRel))
+            >>> len(tree.find(lambda n: type(n.field) == models.OneToOneRel))
             1
 
         :params: any key value pair referencing to attributes of nodes
         :return: tuple of nodes
         """
-        filter = lambda n: all(getattr(n, k) == v for k, v in params.items())
         return findall(self, filter)
 
     def iterate(self, by_level=False, by_grouped_level=False, maxlevel=None, has_items=False, filter=None):

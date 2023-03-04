@@ -165,11 +165,11 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(root.get(field_path).field_path, field_path)
         self.assertIsNone(root.get('dummy__path'))
         self.assertTrue(root.get('root').is_root)
-        self.assertRaises(CountError, root.get, model=ModelC)
+        self.assertRaises(CountError, root.get, filter=lambda n: n.model == ModelC)
 
         # find
-        self.assertEqual(len(root.find(field_type=models.ManyToManyField)), 5)
-        self.assertEqual(len(root.find(model=ModelC)), 7)
+        self.assertEqual(len(root.find(lambda n: type(n.field) == models.ManyToManyField)), 5)
+        self.assertEqual(len(root.find(lambda n: n.model == ModelC)), 7)
 
 
         # render and show
@@ -181,7 +181,13 @@ class ModelTreeTestCase(TestCase):
         self.assertIn(nodes[4].label, root.render().by_attr('label'))
         with redirect_stdout(StringIO()) as stdout:
             root.show()
-        self.assertIn(nodes[4].verbose_label, stdout.getvalue())
+        self.assertIn(str(nodes[4]), stdout.getvalue())
+        with redirect_stdout(StringIO()) as stdout:
+            root.show('[{node.relation_type}]{node.field.name} -> {node.model._meta.object_name}')
+        self.assertIn('[many_to_many]modele -> ModelE', stdout.getvalue())
+        with redirect_stdout(StringIO()) as stdout:
+            root.show(root_format='{node.model._meta.model_name}')
+        self.assertRegex(stdout.getvalue(), r'^modela')
 
     def test_10_docstrings(self):
         globs = dict(
