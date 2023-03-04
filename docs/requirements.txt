@@ -1,5 +1,4 @@
 Sphinx<5,>=3.5.4
-sphinxcontrib-napoleon
 sphinx-book-theme
 Django
 anytree
