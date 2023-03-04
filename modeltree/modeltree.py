@@ -349,15 +349,15 @@ class ModelTree(AnyNode):
     def show(self, format='{node}', root_format='{node}'):
         """
         Print a tree. Each node will be rendered by using a format string which
-        reference the node object by the key `node'::
+        reference the node object by the key *node*::
 
-        >>> tree = ModelTree(ModelOne)
-        >>> tree.show('{node.field.model._meta.object_name}.{node.field.name} -> {node.model._meta.object_name}')
-        ModelOne
-        └── ModelOne.model_two -> ModelTwo
-            └── ModelTwo.model_three -> ModelThree
-                ├── ModelThree.model_four -> ModelFour
-                └── ModelThree.model_five -> ModelFive
+            >>> tree = ModelTree(ModelOne)
+            >>> tree.show('{node.field.model._meta.object_name}.{node.field.name} -> {node.model._meta.object_name}')
+            ModelOne
+            └── ModelOne.model_two -> ModelTwo
+                └── ModelTwo.model_three -> ModelThree
+                    ├── ModelThree.model_four -> ModelFour
+                    └── ModelThree.model_five -> ModelFive
 
         :param str format: format string to render a node object (optional)
         :param str root_format: format string to render the root node object (optional)
