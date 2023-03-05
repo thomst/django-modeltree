@@ -9,7 +9,7 @@ from testapp.models import ModelOne, ModelTwo, ModelThree, ModelFour, ModelFive
 def create_test_data():
     # create admin-user
     User.objects.all().delete()
-    User.objects.create_superuser('admin', password='adminpassword')
+    User.objects.create_superuser('admin', 'admin@testapp.de', 'adminpassword')
 
     # clear existing data
     ModelA.objects.all().delete()
