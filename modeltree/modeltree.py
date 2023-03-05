@@ -368,6 +368,18 @@ class ModelTree(AnyNode):
                     ├── ModelThree.model_four -> ModelFour
                     └── ModelThree.model_five -> ModelFive
 
+        A format string referencing the :attr:`.field` attribute won't be
+        appropriate for the root node since it has no field. To adjust the way
+        the root node is rendered use the root_format keyword argument::
+
+            >>> tree = ModelTree(ModelOne)
+            >>> tree.show(root_format='{node.model._meta.verbose_name}')
+            model one
+            └── model_two -> ModelTwo
+                └── model_three -> ModelThree
+                    ├── model_four -> ModelFour
+                    └── model_five -> ModelFive
+
         :param str format: format string to render a node object (optional)
         :param str root_format: format string to render the root node object (optional)
         """
