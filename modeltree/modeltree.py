@@ -355,7 +355,7 @@ class ModelTree(AnyNode):
         """
         return RenderTree(self)
 
-    def show(self, format='{node}', root_format='{node}'):
+    def show(self, format='{node}', root_format='{node}', with_items=False):
         """
         Print a tree. Each node will be rendered by using a format string which
         reference the node object by the key *node*::
@@ -382,13 +382,22 @@ class ModelTree(AnyNode):
 
         :param str format: format string to render a node object (optional)
         :param str root_format: format string to render the root node object (optional)
+        :param bool with_items: include the node's items (optional)
         """
-        for prefix, _, node in self.render():
+        count = len(self.descendants)
+        for index, (prefix, multiline_prefix, node) in enumerate(self.render()):
             if root_format and node.is_root:
                 label = root_format.format(node=node)
             else:
                 label = format.format(node=node)
             print(f'{prefix}{label}')
+            if not node.items is None and with_items:
+                if index == count:
+                    item_prefix = '  ~ '
+                else:
+                    item_prefix = '│ ~ '
+                for item in node.items:
+                    print(f'{multiline_prefix}{item_prefix}{item}')
 
     def get(self, field_path=None, filter=None):
         """
