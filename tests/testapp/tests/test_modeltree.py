@@ -207,7 +207,7 @@ class ModelTreeTestCase(TestCase):
         try:
             doctest.testfile(modeltree_file, globs=globs, raise_on_error=True)
         except (doctest.UnexpectedException, doctest.DocTestFailure) as exc:
-            print(exc.example.lineno, exc.example.source)
+            doctest.testfile(modeltree_file, globs=globs)
             raise exc
 
     def test_11_tree_with_follow_method(self):
