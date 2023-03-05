@@ -211,6 +211,6 @@ class ModelTreeTestCase(TestCase):
             raise exc
 
     def test_11_tree_with_follow_method(self):
-        root = TreeWithFollowMethod(ModelA)
+        root = TreeWithFollowMethod(ModelOne)
         self.assertTrue(any(n.model._meta.app_label == 'auth' for n in root.iterate()))
         self.assertTrue(all(n.model not in [Group, Permission] for n in root.iterate()))
