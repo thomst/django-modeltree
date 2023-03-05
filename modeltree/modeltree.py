@@ -394,9 +394,9 @@ class ModelTree(AnyNode):
                 ├── model_four -> ModelFour
                 │     ~ ModelFour object (0)
                 └── model_five -> ModelFive
-                    ~ ModelFive object (3)
-                    ~ ModelFive object (4)
-                    ~ ModelFive object (5)
+                      ~ ModelFive object (3)
+                      ~ ModelFive object (4)
+                      ~ ModelFive object (5)
 
         :param str format: format string to render a node object (optional)
         :param str root_format: format string to render the root node object (optional)
