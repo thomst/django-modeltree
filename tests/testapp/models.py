@@ -20,7 +20,6 @@ class ModelA(BaseModel):
     model_b = models.OneToOneField('ModelB', blank=True, null=True, on_delete=models.SET_NULL)
     model_c = models.ForeignKey('ModelC', blank=True, null=True, on_delete=models.SET_NULL)
     model_d = models.ManyToManyField('ModelD', blank=True)
-    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
 
 class ModelB(BaseModel):
@@ -50,6 +49,7 @@ class ModelE(BaseModel):
 
 # These models are used in the docstring-documentation
 class ModelOne(models.Model):
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     model_two = models.ManyToManyField(
         'ModelTwo',
         related_name='model_one',
@@ -78,7 +78,7 @@ class ModelFour(models.Model):
 
 
 class ModelFive(models.Model):
-    model_two = models.ManyToManyField(
+    model_three = models.ManyToManyField(
         'ModelThree',
         related_name='model_five',
         blank=True)
