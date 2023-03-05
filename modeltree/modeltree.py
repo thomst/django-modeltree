@@ -384,15 +384,14 @@ class ModelTree(AnyNode):
         :param str root_format: format string to render the root node object (optional)
         :param bool with_items: include the node's items (optional)
         """
-        count = len(self.descendants)
-        for index, (prefix, multiline_prefix, node) in enumerate(self.render()):
+        for prefix, multiline_prefix, node in self.render():
             if root_format and node.is_root:
                 label = root_format.format(node=node)
             else:
                 label = format.format(node=node)
             print(f'{prefix}{label}')
             if not node.items is None and with_items:
-                if index == count:
+                if node.is_leaf:
                     item_prefix = '  ~ '
                 else:
                     item_prefix = '│ ~ '
