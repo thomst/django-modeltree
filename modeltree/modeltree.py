@@ -398,37 +398,57 @@ class ModelTree(AnyNode):
                 for item in node.items:
                     print(f'{multiline_prefix}{item_prefix}{item}')
 
-    def get(self, field_path=None, filter=None):
+    def get(self, field_path=None, filter=None, **params):
         """
-        Either lookup a node by its :attr:`.field_path` or use a filter::
+        Either lookup a node by its :attr:`.field_path` or a filter or node
+        attributes::
 
             >>> tree = ModelTree(ModelOne)
             >>> tree.get('model_two') == tree.get(filter=lambda n: n.model == ModelTwo)
             True
+            >>> tree.get('model_two') == tree.get(model=ModelTwo)
+            True
 
         :param str field_path: a node's :attr:`.field_path` (optional)
-        :params: any key value pair referencing to a node's attribute
+        :param callable filter: callable taking a node and returning a boolean (optional)
+        :param \*\*params: any node attribute to use for a lookup (optional)
         :return: node object or None if no node matches the search parameters
         :rtype: :class:`~modeltree.ModelTree` or None
         :raises: :class:`~anytree.search.CountError`: if more than one node was found
         """
         if field_path:
             filter = lambda n: n.field_path == field_path
+        else:
+            filters = list()
+            for key, value in params.items():
+                filters.append(lambda n: getattr(n, key) == value)
+            if filter:
+                filters.append(filter)
+            filter = lambda n: all(f(n) for f in filters)
         return find(self, filter)
 
-    def find(self, filter):
+    def find(self, filter=None, **params):
         """
-        Find nodes using a filter::
+        Find nodes using a filter or node attributes::
 
             >>> tree = ModelTree(ModelOne)
+            >>> tree.find(lambda n: n.model == ModelTwo) == tree.find(model=ModelTwo)
+            True
             >>> len(tree.find(lambda n: n.relation_type == 'many_to_many'))
             2
             >>> len(tree.find(lambda n: type(n.field) == models.OneToOneRel))
             1
 
-        :params: any key value pair referencing to attributes of nodes
+        :param callable filter: callable taking a node and returning a boolean (optional)
+        :param \*\*params: any node attribute to use for a lookup (optional)
         :return: tuple of nodes
         """
+        filters = list()
+        for key, value in params.items():
+            filters.append(lambda n: getattr(n, key) == value)
+        if filter:
+            filters.append(filter)
+        filter = lambda n: all(f(n) for f in filters)
         return findall(self, filter)
 
     def iterate(self, by_level=False, by_grouped_level=False, maxlevel=None, has_items=False, filter=None):

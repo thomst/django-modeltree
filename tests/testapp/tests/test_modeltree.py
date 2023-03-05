@@ -168,6 +168,7 @@ class ModelTreeTestCase(TestCase):
         nodes = list(root.iterate(by_level=True))
         field_path = nodes[6].field_path
         self.assertEqual(root.get(field_path).field_path, field_path)
+        self.assertEqual(root.get(field_path=field_path), root.get(field_path))
         self.assertIsNone(root.get('dummy__path'))
         self.assertTrue(root.get('root').is_root)
         self.assertRaises(CountError, root.get, filter=lambda n: n.model == ModelC)
@@ -175,6 +176,7 @@ class ModelTreeTestCase(TestCase):
         # find
         self.assertEqual(len(root.find(lambda n: type(n.field) == models.ManyToManyField)), 5)
         self.assertEqual(len(root.find(lambda n: n.model == ModelC)), 7)
+        self.assertEqual(len(root.find(model=ModelC)), 7)
 
         # render and show
         self.assertIsInstance(root.render(), RenderTree)
