@@ -192,6 +192,11 @@ class ModelTreeTestCase(TestCase):
             root.show(root_format='{node.model._meta.model_name}')
         self.assertRegex(stdout.getvalue(), r'^modela')
 
+        root = ModelTree(ModelC, ModelC.objects.all())
+        with redirect_stdout(StringIO()) as stdout:
+            root.show(with_items=True)
+        self.assertRegex(stdout.getvalue(), '~ modelc \[0\]')
+
     def test_10_docstrings(self):
         globs = dict(
             models=models,
