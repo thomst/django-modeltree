@@ -380,6 +380,24 @@ class ModelTree(AnyNode):
                     ├── model_four -> ModelFour
                     └── model_five -> ModelFive
 
+        Use the show_items argument to render the tree with each node's items
+        listed below the node::
+
+            >>> tree = ModelTree(ModelTwo, ModelTwo.objects.filter(pk=4))
+            >>> tree.show(with_items=True)
+            ModelTwo
+            │ ~ ModelTwo object (4)
+            ├── model_one -> ModelOne
+            │     ~ ModelOne object (2)
+            └── model_three -> ModelThree
+                │ ~ ModelThree object (0)
+                ├── model_four -> ModelFour
+                │     ~ ModelFour object (0)
+                └── model_five -> ModelFive
+                    ~ ModelFive object (3)
+                    ~ ModelFive object (4)
+                    ~ ModelFive object (5)
+
         :param str format: format string to render a node object (optional)
         :param str root_format: format string to render the root node object (optional)
         :param bool with_items: include the node's items (optional)
