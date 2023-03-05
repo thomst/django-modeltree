@@ -88,7 +88,7 @@ with which you initiated your tree::
     >>> tree = ModelTree(ModelOne, items)
     >>> model_five_node = tree.get(filter=lambda n: n.model == ModelFive)
     >>> len(model_five_node.items)
-    0
+    3
 
 See the :attr:`~.ModelTree.items` section for more information about how items
 are processed.
@@ -181,7 +181,7 @@ class ModelTree(AnyNode):
         >>> tree = ModelTree(ModelOne, items)
         >>> model_four_node = tree.get(filter=lambda n: n.model == ModelFour)
         >>> len(model_four_node.items)
-        0
+        2
 
     :param model: model to start with
     :type model: :class:`~django.db.models.Model`
@@ -323,14 +323,14 @@ class ModelTree(AnyNode):
         it will be the :attr:`.items` attribute of the root node. All child
         nodes hold a queryset of elements that are derived of the initial one::
 
-            >>> items_one = ModelOne.objects.all().values_list('pk', flat=True)
+            >>> items_one = ModelOne.objects.all()
             >>> items_two = ModelTwo.objects.filter(
-            ...     model_one__pk__in=items_one).values_list('pk', flat=True)
+            ...     model_one__pk__in=items_one.values_list('pk', flat=True))
             >>> items_three = ModelThree.objects.filter(
-            ...     model_two__pk__in=items_two)
+            ...     model_two__pk__in=items_two.values_list('pk', flat=True))
             >>> tree = ModelTree(ModelOne, items_one)
             >>> node_three = tree.get('model_two__model_three')
-            >>> list(node_three.items) == list(items_three)
+            >>> set(node_three.items) == set(items_three)
             True
 
         Items of a node are lazy. Querysets are evaluated not until an items
@@ -373,8 +373,8 @@ class ModelTree(AnyNode):
         the root node is rendered use the root_format keyword argument::
 
             >>> tree = ModelTree(ModelOne)
-            >>> tree.show(root_format='{node.model._meta.verbose_name}')
-            model one
+            >>> tree.show(root_format='<{node.model._meta.verbose_name}>')
+            <model one>
             └── model_two -> ModelTwo
                 └── model_three -> ModelThree
                     ├── model_four -> ModelFour
