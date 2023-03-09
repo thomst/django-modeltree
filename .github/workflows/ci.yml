@@ -1,4 +1,4 @@
-name: Run tests for django-modeltree
+name: CI
 
 on:
   push:
