@@ -580,4 +580,5 @@ class ModelTree(AnyNode):
         if self.depth < self.MAX_DEPTH:
             for field in self.model._meta.get_fields():
                 if self._follow_this_field(field):
-                    self.__class__(model=field.related_model, field=field, parent=self)
+                    node = self.__class__(model=field.related_model, field=field, parent=self)
+                    setattr(self, f'__{field.name}', node)

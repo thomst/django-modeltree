@@ -221,3 +221,9 @@ class ModelTreeTestCase(TestCase):
         root = TreeWithFollowMethod(ModelOne)
         self.assertTrue(any(n.model._meta.app_label == 'auth' for n in root.iterate()))
         self.assertTrue(all(n.model not in [Group, Permission] for n in root.iterate()))
+
+    def test_12_node_references(self):
+        tree = ModelTree(ModelOne)
+        for node in tree.iterate(by_level=True):
+            for child in node.children:
+                hasattr(node, child.field.name)
