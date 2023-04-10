@@ -1,18 +1,26 @@
 """
 .. note::
 
-    While modeltree is functional and well tested, it's in an early state of
-    its development. Backward incompatible api changes are possible. Feedback
-    and suggestions about the api are very welcome. Just open an issue on
-    github.
+    While modeltree is functional and well tested, it's in an early state of its
+    development. Backward incompatible api changes are possible. Feedback and
+    suggestions about the api are very welcome. Just open an issue on github.
+
+
+About
+-----
+Do you have a model layout with various relations and looking for a way to
+navigate it with ease? Then django-modeltree is what you are looking for. Build
+your modeltree in a single line and accessing related models and their objects
+in a elegant and performant way. No need for complex query building anymore.
+Give it a try...
 
 
 What is a ModelTree?
 --------------------
 
-A ModelTree describes a :class:`~django.db.models.Model` and all its
-recursive relations to other models. It is :class:`~anytree.node.node.Node`
-based, iterable, walkable, searchable and can be populated by
+A ModelTree describes a :class:`~django.db.models.Model` and all its recursive
+relations to other models. It is :class:`~anytree.node.node.Node` based,
+iterable, walkable, searchable and can be populated by
 :attr:`~.ModelTree.items`.
 
 Guess you have these models::
@@ -74,31 +82,29 @@ This is very easy. Simply pass in the model the tree should be rooted to::
 
     tree = ModelTree(ModelOne)
 
-Optionally you can pass in a queryset of your model. Every node then will be
-populated by items of the node's :attr:`~.ModelTree.model` that are related
-to these initial items by the direct or indirect relation of their models::
+Optionally you can pass in a queryset of your model::
 
     >>> items = ModelOne.objects.all()
     >>> tree = ModelTree(ModelOne, items)
 
-Guess you want all ModelFive items that are related to the ModelOne items
-with which you initiated your tree::
+You will be able then to recieve a queryset of related objects of the models of
+your modeltree by accessing the :attr:`~.ModelTree.items` attribute of each
+node::
 
     >>> items = ModelOne.objects.all()
     >>> tree = ModelTree(ModelOne, items)
-    >>> model_five_node = tree.get(filter=lambda n: n.model == ModelFive)
-    >>> len(model_five_node.items)
+    >>> len(tree['model_two']['model_three']['model_five'].items)
     3
 
 See the :attr:`~.ModelTree.items` section for more information about how items
 are processed.
 
 
-What if I don't want to follow all model relations?
----------------------------------------------------
+How to customize my modeltree?
+------------------------------
 
-You can easily adjust the way your tree is build up. Therefore overwrite one
-or more of the following class attributes in your ModelTree subclass:
+You can easily adjust the way your tree is build up. Therefore overwrite one or
+more of the following class attributes in your ModelTree subclass:
 
 * :attr:`~.ModelTree.MAX_DEPTH`
 * :attr:`~.ModelTree.FOLLOW_ACROSS_APPS`
@@ -167,7 +173,7 @@ class ModelTree(AnyNode):
                 └── model_five -> ModelFive
 
     In advance you can pass in some items of your model as a queryset. The
-    :attr:`.items` property of each node of your tree then reflects the itmes
+    :attr:`.items` property of each node of your tree then reflects the items
     that are derived from the initial items by the direct or indirect relations
     of their models.
 
@@ -227,7 +233,7 @@ class ModelTree(AnyNode):
         ]
 
     .. note::
-    
+
         Generic relations using the contenttypes framework are not supported.
     """
 
@@ -515,7 +521,7 @@ class ModelTree(AnyNode):
             ...          return True
             ...       else:
             ...          return False
-            ... 
+            ...
             >>> tree = MyModelTree(ModelOne)
             >>> all(n.model._meta.app_label == 'testapp' for n in tree.iterate())
             True
