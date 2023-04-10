@@ -103,8 +103,8 @@ are processed.
 How to navigate a modeltree?
 ----------------------------
 
-A model tree has a simple __getitem__ implementation that allows you to access
-each related node with the name of its :attr:`~.ModelTree.field` attribute as
+A model tree has a simple dict api implementation that allows you to access
+each child node by the name of its :attr:`~.ModelTree.field` attribute as
 key::
 
     >>> tree = ModelTree(ModelOne)
