@@ -100,6 +100,31 @@ See the :attr:`~.ModelTree.items` section for more information about how items
 are processed.
 
 
+How to navigate a modeltree?
+----------------------------
+
+A model tree has a simple __getitem__ implementation that allows you to access
+each related node with the name of its :attr:`~.ModelTree.field` attribute as
+key::
+
+    >>> tree = ModelTree(ModelOne)
+    >>> tree['model_two'].field.name
+    'model_two'
+
+Building your tree is a one-liner but gives you access to all related models and
+model objects at once - regardless of the direction or type of the involved
+relations::
+
+    >>> tree = ModelTree(ModelOne, ModelOne.objects.filter(pk__in=[1, 2, 3]))
+    >>> tree['model_two']['model_three'].model
+    <class 'testapp.models.ModelThree'>
+    >>> tree['model_two']['model_three'].items
+    <QuerySet [<ModelThree: ModelThree object (0)>, <ModelThree: ModelThree object (1)>]>
+
+For further options to access related tree nodes see :meth:`~.ModelTree.get`
+and :meth:`~.ModelTree.find`.
+
+
 How to customize my modeltree?
 ------------------------------
 
@@ -261,6 +286,7 @@ class ModelTree(AnyNode):
         self._model = model
         self._field = field
         self._items = items
+        self._children_by_field = dict()
         self._build_tree()
 
     def __str__(self):
@@ -272,6 +298,15 @@ class ModelTree(AnyNode):
     def __repr__(self):
         classname = type(self).__name__
         return '{}(model={}, field={})'.format(classname, repr(self._model), repr(self._field))
+
+    def __contains__(self, __key):
+        return self._children_by_field.__contains__(__key)
+
+    def __getitem__(self, __key):
+        return self._children_by_field.__getitem__(__key)
+
+    def __iter__(self):
+        return self._children_by_field.__iter__()
 
     @property
     def model(self):
@@ -587,4 +622,4 @@ class ModelTree(AnyNode):
             for field in self.model._meta.get_fields():
                 if self._follow_this_field(field):
                     node = self.__class__(model=field.related_model, field=field, parent=self)
-                    setattr(self, f'__{field.name}', node)
+                    self._children_by_field[field.name] = node

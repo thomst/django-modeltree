@@ -227,3 +227,10 @@ class ModelTreeTestCase(TestCase):
         for node in tree.iterate(by_level=True):
             for child in node.children:
                 hasattr(node, child.field.name)
+
+    def test_13_dict_api(self):
+        tree = ModelTree(ModelOne)
+        self.assertTrue('model_two' in tree)
+        self.assertTrue('model_three' in tree['model_two'])
+        self.assertTrue('model_four' in tree['model_two']['model_three'])
+        self.assertTrue('model_five' in tree['model_two']['model_three'])
