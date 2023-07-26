@@ -136,6 +136,7 @@ more of the following class attributes in your ModelTree subclass:
 * :attr:`~.ModelTree.RELATION_TYPES`
 * :attr:`~.ModelTree.FIELD_TYPES`
 * :attr:`~.ModelTree.FIELD_PATHS`
+* :attr:`~.ModelTree.MODELS`
 
 Guess you whish to only follow specific relation-types::
 
@@ -279,6 +280,20 @@ class ModelTree(AnyNode):
     * model_two__model_three__model_four
 
     By default all field-paths will be followed.
+    """
+
+    MODELS = None
+    """
+    A list of models to follow when building the tree.
+    ::
+
+        MODELS = [
+            ModelOne,
+            ModelTwo,
+            ModelThree
+        ]
+
+    By default all models will be followed.
     """
 
     def __init__(self, model, items=None, field=None, **kwargs):
@@ -608,6 +623,10 @@ class ModelTree(AnyNode):
 
         # Only follow specific field-paths.
         elif self.FIELD_PATHS and not self._follow_this_path(field):
+            return False
+
+        # Only follow specific models.
+        elif self.MODELS and not field.related_model in self.MODELS:
             return False
 
         # Allow customizing the tree building by follow method.
