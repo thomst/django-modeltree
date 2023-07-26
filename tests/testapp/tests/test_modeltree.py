@@ -49,6 +49,14 @@ class TreeWithFollowMethod(ModelTree):
             return True
 
 
+class TreeWithModels(ModelTree):
+    MODELS = [
+        ModelOne,
+        ModelTwo,
+        ModelThree,
+    ]
+
+
 class ModelTreeTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -234,3 +242,8 @@ class ModelTreeTestCase(TestCase):
         self.assertTrue('model_three' in tree['model_two'])
         self.assertTrue('model_four' in tree['model_two']['model_three'])
         self.assertTrue('model_five' in tree['model_two']['model_three'])
+
+    def test_14_tree_with_models(self):
+        tree = TreeWithModels(ModelOne)
+        for node in tree.iterate():
+            self.assertIn(node.model, TreeWithModels.MODELS)
