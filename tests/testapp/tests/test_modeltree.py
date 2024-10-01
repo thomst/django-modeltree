@@ -205,7 +205,7 @@ class ModelTreeTestCase(TestCase):
         root = ModelTree(ModelC, ModelC.objects.all())
         with redirect_stdout(StringIO()) as stdout:
             root.show(with_items=True)
-        self.assertRegex(stdout.getvalue(), '~ modelc \[0\]')
+        self.assertRegex(stdout.getvalue(), r'~ modelc \[0\]')
 
     def test_10_docstrings(self):
         globs = dict(
