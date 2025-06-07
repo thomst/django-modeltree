@@ -525,6 +525,8 @@ class ModelTree(AnyNode):
         filter = lambda n: all(f(n) for f in filters)
         return findall(self, filter)
 
+    # FIXME: Wouldn't it be fine to have a filters argument instead of filter?
+    # This allows overwriting class to easily add there own filters.
     def iterate(self, by_level=False, by_grouped_level=False, maxlevel=None, has_items=False, filter=None):
         """
         Return a tree iterator using the iteration classes of anytree:
