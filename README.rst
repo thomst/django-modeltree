@@ -40,3 +40,4 @@ Installation
 Install from pypi.org::
 
     pip install django-modeltree
+

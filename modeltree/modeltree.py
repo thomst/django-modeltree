@@ -264,7 +264,7 @@ class ModelTree(AnyNode):
     """
 
     FIELD_PATHS = None
-    """
+    r"""
     A list of :attr:`.field_path`\s to follow when building the tree.
     Intermediated field-paths will be complemented. Guess you have this
     field-path specified::
@@ -473,7 +473,7 @@ class ModelTree(AnyNode):
                     print(f'{multiline_prefix}{item_prefix}{item}')
 
     def get(self, field_path=None, filter=None, **params):
-        """
+        r"""
         Either lookup a node by its :attr:`.field_path` or a filter or node
         attributes::
 
@@ -502,7 +502,7 @@ class ModelTree(AnyNode):
         return find(self, filter)
 
     def find(self, filter=None, **params):
-        """
+        r"""
         Find nodes using a filter or node attributes::
 
             >>> tree = ModelTree(ModelOne)
