@@ -178,7 +178,6 @@ class ModelTreeTestCase(TestCase):
         self.assertEqual(root.get(field_path).field_path, field_path)
         self.assertEqual(root.get(field_path=field_path), root.get(field_path))
         self.assertIsNone(root.get('dummy__path'))
-        self.assertTrue(root.get('root').is_root)
         self.assertRaises(CountError, root.get, filter=lambda n: n.model == ModelC)
 
         # find
@@ -194,7 +193,7 @@ class ModelTreeTestCase(TestCase):
         self.assertIn(str(nodes[4].field), root.render().by_attr('field'))
         with redirect_stdout(StringIO()) as stdout:
             root.show()
-        self.assertIn(str(nodes[4]), stdout.getvalue())
+        self.assertIn(nodes[4].model._meta.object_name, stdout.getvalue())
         with redirect_stdout(StringIO()) as stdout:
             root.show('[{node.relation_type}]{node.field.name} -> {node.model._meta.object_name}')
         self.assertIn('[many_to_many]modele -> ModelE', stdout.getvalue())
@@ -247,3 +246,16 @@ class ModelTreeTestCase(TestCase):
         tree = TreeWithModels(ModelOne)
         for node in tree.iterate():
             self.assertIn(node.model, TreeWithModels.MODELS)
+
+    def test_15_string_method(self):
+        tree = ModelTree(ModelA)
+        self.assertEqual(str(tree.root), tree.root.model._meta.object_name)
+        for node in tree.iterate(filter=lambda n: not n.is_root):
+            path = ' -> '.join(f'{n.parent.model._meta.object_name}.{n.field.name}' for n in node.path[1:])
+            self.assertEqual(str(node), f'{path} => {node.model._meta.object_name}')
+
+    def test_16_representation_method(self):
+        tree = ModelTree(ModelA)
+        for node in tree.iterate():
+            classname = type(node).__name__
+            self.assertEqual(repr(node), f'{classname}(model={node.model}, field={node.field}, field_path={node.field_path})')
