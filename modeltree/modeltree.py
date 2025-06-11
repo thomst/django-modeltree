@@ -305,14 +305,15 @@ class ModelTree(AnyNode):
         self._build_tree()
 
     def __str__(self):
-        if self._field:
-            return '{} -> {}'.format(self._field.name, self._model._meta.object_name)
+        if self.is_root:
+            return self._model._meta.object_name
         else:
-            return '{}'.format(self._model._meta.object_name)
+            path = ' -> '.join(f'{n.parent.model._meta.object_name}.{n.field.name}' for n in self.path[1:])
+            return f'{path} => {self._model._meta.object_name}'
 
     def __repr__(self):
         classname = type(self).__name__
-        return '{}(model={}, field={})'.format(classname, repr(self._model), repr(self._field))
+        return f'{classname}(model={self._model}, field={self._field}, field_path={self.field_path})'
 
     def __contains__(self, __key):
         return self._children_by_field.__contains__(__key)
@@ -406,7 +407,10 @@ class ModelTree(AnyNode):
         """
         return RenderTree(self)
 
-    def show(self, format='{node}', root_format='{node}', with_items=False):
+    def show(self,
+             format='{node.field.name} -> {node.model._meta.object_name}',
+             root_format='{node.model._meta.object_name}',
+             with_items=False):
         """
         Print a tree. Each node will be rendered by using a format string which
         reference the node object by the key *node*::
@@ -454,7 +458,7 @@ class ModelTree(AnyNode):
         :param bool with_items: include the node's items (optional)
         """
         for prefix, multiline_prefix, node in self.render():
-            if root_format and node.is_root:
+            if node.is_root:
                 label = root_format.format(node=node)
             else:
                 label = format.format(node=node)
