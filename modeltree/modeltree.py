@@ -343,12 +343,12 @@ class ModelTree(AnyNode):
         """
         String describing the relation type of :attr:`.field`.
         See :attr:`.RELATION_TYPES` for possible values.
-        This is an empty string for the root node.
+        This is None for the root node.
         """
-        if self.field:
-            return [t for t in RELATION_TYPES if getattr(self.field, t)][0]
+        if self.is_root:
+            return None
         else:
-            return str()
+            return [t for t in RELATION_TYPES if getattr(self.field, t)][0]
 
     @property
     def field_path(self):
@@ -360,15 +360,10 @@ class ModelTree(AnyNode):
             >>> node_four.field_path
             'model_two__model_three__model_four'
 
-        Since the root-modelnode has no field by its own it is represented by
-        the string 'root'::
-
-            >>> tree.root.field_path
-            'root'
-
+        This is None for the root node.
         """
         if self.is_root:
-            return 'root'
+            return None
         else:
             return '__'.join(n.field.name for n in self.path[1:])
 
