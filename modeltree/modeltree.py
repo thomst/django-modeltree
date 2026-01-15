@@ -1,11 +1,4 @@
 """
-.. note::
-
-    While modeltree is functional and well tested, it's in an early state of its
-    development. Backward incompatible api changes are possible. Feedback and
-    suggestions about the api are very welcome. Just open an issue on github.
-
-
 About
 -----
 Do you have a model layout with various relations and looking for a way to
