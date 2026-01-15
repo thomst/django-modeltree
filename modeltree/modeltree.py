@@ -4,7 +4,7 @@ About
 Do you have a model layout with various relations and looking for a way to
 navigate it with ease? Then django-modeltree is what you are looking for. Build
 your modeltree in a single line and accessing related models and their objects
-in a elegant and performant way. No need for complex query building anymore.
+in a convenient and performant way. No need for complex query building anymore.
 Give it a try...
 
 
