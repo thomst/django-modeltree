@@ -10,8 +10,8 @@ Welcome to django-modeltree
    :target: https://img.shields.io/badge/django-2.2%20%7C%203.0%20%7C%203.1%20%7C%203.2%20%7C%204.0%20%7C%204.1%20%7C%204.2%20%7C%205.0%20%7C%205.1%20%7C%205.2%20%7C%206.0-orange
    :alt: django: 2.2, 3.0, 3.1, 3.2, 4.0, 4.1, 4.2, 5.0, 5.1, 5.2, 6.0
 
-.. image:: https://github.com/thomst/django-modeltree/actions/workflows/ci.yml/badge.svg
-   :target: https://github.com/thomst/django-modeltree/actions/workflows/ci.yml
+.. image:: https://github.com/thomst/django-modeltree/actions/workflows/tests.yml/badge.svg
+   :target: https://github.com/thomst/django-modeltree/actions/workflows/tests.yml
    :alt: Run tests for django-modeltree
 
 .. image:: https://coveralls.io/repos/github/thomst/django-modeltree/badge.svg?branch=main
