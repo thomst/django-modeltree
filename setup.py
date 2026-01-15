@@ -34,6 +34,7 @@ setup(
     version=version,
     description="TODO",
     long_description=read("README.rst"),
+    long_description_content_type="text/x-rst",
     author="Thomas Leichtfuß",
     author_email="thomas.leichtfuss@posteo.de",
     license="BSD License",
