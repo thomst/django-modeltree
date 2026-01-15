@@ -1,10 +1,10 @@
 name: Check, build and deploy docs.
 
 on:
-  # Runs on pushing tags
+  # Build the docs on every push to main.
+  # Deploy them only on tag pushes using a condition in the deploy step.
   push:
-    tags:
-      - '*'
+    branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -40,4 +40,5 @@ jobs:
           path: docs/build/html/
       - name: Deploy to GitHub Pages
         id: deployment
+        if: startsWith(github.ref, 'refs/tags')
         uses: actions/deploy-pages@v4
