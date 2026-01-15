@@ -534,7 +534,7 @@ class ModelTree(AnyNode):
         * :class:`~anytree.iterators.levelorderiter.LevelOrderIter`
         * :class:`~anytree.iterators.levelordergroupiter.LevelOrderGroupIter`
 
-        By default an instance of the ProOrderIter class will be returned.
+        By default an instance of the PreOrderIter class will be returned.
 
         :param bool by_level: use the LevelOrderIter class
         :param bool by_grouped_level: use the LevelOrderGroupIter class
