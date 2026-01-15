@@ -26,6 +26,7 @@ class ModelB(BaseModel):
     id = models.SmallIntegerField(primary_key=True)
     model_b = models.OneToOneField('ModelB', blank=True, null=True, on_delete=models.SET_NULL)
     model_c = models.ForeignKey('ModelC', blank=True, null=True, on_delete=models.SET_NULL)
+    model_cc = models.ForeignKey('ModelC', blank=True, null=True, on_delete=models.SET_NULL, related_name='model_b_cc')
 
 
 class ModelC(BaseModel):
