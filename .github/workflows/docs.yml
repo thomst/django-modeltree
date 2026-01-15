@@ -1,9 +1,10 @@
 name: Check, build and deploy docs.
 
 on:
-  # Runs on pushes targeting the default branch
+  # Runs on pushing tags
   push:
-    branches: [ main ]
+    tags:
+      - '*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
