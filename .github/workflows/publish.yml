@@ -1,13 +1,10 @@
 name: Publish django-modeltree to pypi
 
 on:
-  # Run when a new tag is pushed.
+  # Publish to test.pypi on every push to main.
+  # Publishing to the real pypi only on tag pushes. (See if condition below.)
   push:
-    tags:
-      - '*'
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+    branches: [ main ]
 
 
 jobs:
