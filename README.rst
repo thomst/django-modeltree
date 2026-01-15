@@ -14,8 +14,8 @@ Welcome to django-modeltree
    :target: https://github.com/thomst/django-modeltree/actions/workflows/ci.yml
    :alt: Run tests for django-modeltree
 
-.. image:: https://coveralls.io/repos/github/thomst/django-modeltree/badge.svg?branch=master
-   :target: https://coveralls.io/github/thomst/django-modeltree?branch=master
+.. image:: https://coveralls.io/repos/github/thomst/django-modeltree/badge.svg?branch=main
+   :target: https://coveralls.io/github/thomst/django-modeltree?branch=main
    :alt: Coveralls
 
 
